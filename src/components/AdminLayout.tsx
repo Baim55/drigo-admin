@@ -45,7 +45,7 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-slate-100">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-800">İdarəetmə Paneli</h2>
           <span className="text-sm font-medium text-slate-600">Admin</span>
