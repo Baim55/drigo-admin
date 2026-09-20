@@ -4,6 +4,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import AdminLayout from "../components/AdminLayout";
 import DashboardPage from "../pages/DashboardPage";
 import CarsPage from "../pages/CarsPage";
+import CarDetailPage from "../pages/CarDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
           {
             path: "/cars",
             element: <CarsPage />,
+          },
+          {
+            path: "/cars/:id", 
+            element: <CarDetailPage />, 
           },
         ],
       },

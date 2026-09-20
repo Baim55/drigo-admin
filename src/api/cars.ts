@@ -1,4 +1,4 @@
-import type { PaginatedResponse, Car } from "../types/car";
+import type { PaginatedResponse, Car, CarDetail } from "../types/car";
 import { apiClient } from "./client";
 
 export interface GetCarsParams {
@@ -20,4 +20,8 @@ export function getCars(params: GetCarsParams = {}) {
   return apiClient<PaginatedResponse<Car>>(
     `/api/admin/cars?${query.toString()}`,
   );
+}
+
+export function getCarById(id: number) {
+  return apiClient<CarDetail>(`/api/admin/cars/${id}`);
 }

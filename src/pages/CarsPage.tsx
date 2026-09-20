@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCars } from "../api/cars";
 import type { Car } from "../types/car";
+import { Link } from "react-router-dom";
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -75,10 +76,20 @@ export default function CarsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {cars.map((car) => (
-                    <tr key={car.id} className="hover:bg-slate-50 transition">
-                      <td className="px-4 py-3 text-slate-500">{car.id}</td>
-                      <td className="px-4 py-3 font-medium text-slate-800">
-                        {car.brandName} {car.modelName}
+                    <tr
+                      key={car.id}
+                      className="hover:bg-slate-50/70 transition-colors"
+                    >
+                      <td className="px-5 py-4 text-slate-400 font-mono text-xs">
+                        #{car.id}
+                      </td>
+                      <td className="px-5 py-4 font-semibold text-slate-800">
+                        <Link
+                          to={`/cars/${car.id}`}
+                          className="hover:text-blue-600 hover:underline"
+                        >
+                          {car.brandName} {car.modelName}
+                        </Link>
                       </td>
                       <td className="px-4 py-3 text-slate-600">
                         {car.manufactureYear}
