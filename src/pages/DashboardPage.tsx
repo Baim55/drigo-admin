@@ -29,21 +29,27 @@ export default function DashboardPage() {
   if (!kpis) return null;
 
   const cards = [
-    { label: "Ümumi müştəri", value: kpis.totalMembers },
-    { label: "Ümumi maşın", value: kpis.totalCars },
-    { label: "Aktiv icarələr", value: kpis.activeRentals },
-    { label: "Aktiv rezervasiyalar", value: kpis.activeReservations },
-    { label: "Açıq dəstək bileti", value: kpis.openSupportTickets },
+    { label: "Total customers", value: kpis.totalMembers },
+    { label: "Total cars", value: kpis.totalCars },
+    { label: "Active rentals", value: kpis.activeRentals },
+    { label: "Active reservations", value: kpis.activeReservations },
+    { label: "Open support tickets", value: kpis.openSupportTickets },
     {
-      label: "Onlayn sürücü",
+      label: "Online drivers",
       value: `${kpis.onlineDrivers}/${kpis.totalDeliveryDrivers}`,
     },
-    { label: "Bugünkü gəlir (AED)", value: kpis.todayRevenue.toLocaleString() },
-    { label: "Aylıq gəlir (AED)", value: kpis.monthlyRevenue.toLocaleString() },
-    { label: "Ümumi gəlir (AED)", value: kpis.totalRevenue.toLocaleString() },
-    { label: "Ümumi borc (AED)", value: kpis.totalDebt.toLocaleString() },
-    { label: "Təsdiq gözləyən", value: kpis.pendingVerificationCount },
-    { label: "Təsdiqlənmiş üzv", value: kpis.approvedMembers },
+    {
+      label: "Today's revenue (AED)",
+      value: kpis.todayRevenue.toLocaleString(),
+    },
+    {
+      label: "Monthly revenue (AED)",
+      value: kpis.monthlyRevenue.toLocaleString(),
+    },
+    { label: "Total revenue (AED)", value: kpis.totalRevenue.toLocaleString() },
+    { label: "Total debt (AED)", value: kpis.totalDebt.toLocaleString() },
+    { label: "Pending verification", value: kpis.pendingVerificationCount },
+    { label: "Approved members", value: kpis.approvedMembers },
   ];
 
   return (
