@@ -6,7 +6,7 @@ export async function apiClient<T>(
 ): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    credentials: "include",
+    credentials: "include", 
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
@@ -15,7 +15,7 @@ export async function apiClient<T>(
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.message || `Xeta: ${res.status}`);
+    throw new Error(errorBody.message || `Error: ${res.status}`);
   }
 
   return res.json();
