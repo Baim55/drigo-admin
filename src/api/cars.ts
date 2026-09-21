@@ -6,6 +6,8 @@ export interface GetCarsParams {
   pageSize?: number;
   search?: string;
   isActive?: boolean;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export function getCars(params: GetCarsParams = {}) {
@@ -16,7 +18,8 @@ export function getCars(params: GetCarsParams = {}) {
   if (params.search) query.set("search", String(params.search));
   if (params.isActive !== undefined)
     query.set("isActive", String(params.isActive));
-
+  query.set("sortBy", params.sortBy ?? "id");
+  query.set("sortOrder", params.sortOrder ?? "asc");
   return apiClient<PaginatedResponse<Car>>(
     `/api/admin/cars?${query.toString()}`,
   );
@@ -31,4 +34,14 @@ export function updateCar(id: number, data: Partial<CarDetail>) {
     method: "PUT",
     body: JSON.stringify(data),
   });
+}
+
+export function deleteCar(id: number) {
+  return apiClient<{ success: boolean }>(`/api/admin/cars/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export function toggleCarActive(id: number) {
+  return apiClient<Car>(`/api/admin/cars/${id}/toggle-active`);
 }

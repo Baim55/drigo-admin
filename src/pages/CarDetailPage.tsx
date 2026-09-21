@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getCarById, updateCar } from "../api/cars";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { deleteCar, getCarById, toggleCarActive, updateCar } from "../api/cars";
 import type { CarDetail } from "../types/car";
 
 export default function CarDetailPage() {
@@ -10,6 +10,10 @@ export default function CarDetailPage() {
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const navigate = useNavigate();
+  const [toggling, setToggling] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [formData, setFormData] = useState({
     maxSpeed: "0",
@@ -62,6 +66,39 @@ export default function CarDetailPage() {
     }
   }
 
+  async function handleToggleActive() {
+    if (!id) return;
+    setToggling(true);
+    setError("");
+    try {
+      const updated = await toggleCarActive(Number(id));
+      setCar((prev) => (prev ? { ...prev, ...updated } : updated));
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setToggling(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!id) return;
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this car? This cannot be undone.",
+    );
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError("");
+    try {
+      await deleteCar(Number(id));
+      navigate("/cars");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className="max-w-5xl mx-auto">
       <Link
@@ -87,15 +124,31 @@ export default function CarDetailPage() {
                 {car.plateNumber} · {car.colorName}
               </p>
             </div>
-            <span
-              className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
-                car.isActive
-                  ? "bg-green-50 text-green-700 ring-1 ring-green-200"
-                  : "bg-slate-100 text-slate-500 ring-1 ring-slate-200"
-              }`}
-            >
-              {car.isActive ? "Active" : "Inactive"}
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
+                  car.isActive
+                    ? "bg-green-50 text-green-700 ring-1 ring-green-200"
+                    : "bg-slate-100 text-slate-500 ring-1 ring-slate-200"
+                }`}
+              >
+                {car.isActive ? "Active" : "Inactive"}
+              </span>
+              <button
+                onClick={handleToggleActive}
+                disabled={toggling}
+                className="text-xs font-medium px-3 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50 disabled:opacity-50 transition"
+              >
+                {toggling ? "..." : car.isActive ? "Deactivate" : "Activate"}
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="text-xs font-medium px-3 py-1.5 rounded-md border border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
