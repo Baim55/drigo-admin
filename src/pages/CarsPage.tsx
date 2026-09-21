@@ -30,13 +30,11 @@ export default function CarsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">
-        Cars (Maşınlar)
-      </h1>
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">Cars</h1>
 
       <div className="mb-4">
         <input
-          placeholder="Axtar (marka, model...)"
+          placeholder="Search (brand, model...)"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -46,16 +44,16 @@ export default function CarsPage() {
         />
       </div>
 
-      {loading && <p className="text-slate-500">Yüklənir...</p>}
+      {loading && <p className="text-slate-500">Loading...</p>}
 
       {error && (
         <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Xəta: {error}
+          Error: {error}
         </div>
       )}
 
       {!loading && !error && cars.length === 0 && (
-        <p className="text-slate-500">Heç bir maşın tapılmadı.</p>
+        <p className="text-slate-500">No cars found.</p>
       )}
 
       {!loading && !error && cars.length > 0 && (
@@ -66,11 +64,11 @@ export default function CarsPage() {
                 <thead className="bg-slate-50 text-slate-600 text-left border-b border-slate-200">
                   <tr>
                     <th className="px-4 py-3 font-medium">ID</th>
-                    <th className="px-4 py-3 font-medium">Marka / Model</th>
-                    <th className="px-4 py-3 font-medium">İl</th>
-                    <th className="px-4 py-3 font-medium">Rəng</th>
-                    <th className="px-4 py-3 font-medium">Nömrə</th>
-                    <th className="px-4 py-3 font-medium">Yanacaq</th>
+                    <th className="px-4 py-3 font-medium">Brand / Model</th>
+                    <th className="px-4 py-3 font-medium">Year</th>
+                    <th className="px-4 py-3 font-medium">Color</th>
+                    <th className="px-4 py-3 font-medium">Plate</th>
+                    <th className="px-4 py-3 font-medium">Fuel</th>
                     <th className="px-4 py-3 font-medium">Status</th>
                   </tr>
                 </thead>
@@ -115,7 +113,7 @@ export default function CarsPage() {
                               : "bg-slate-100 text-slate-600"
                           }`}
                         >
-                          {car.isActive ? "Aktiv" : "Deaktiv"}
+                          {car.isActive ? "Active" : "Inactive"}
                         </span>
                       </td>
                     </tr>
@@ -127,7 +125,7 @@ export default function CarsPage() {
 
           <div className="flex items-center justify-between mt-4">
             <p className="text-sm text-slate-500">
-              Cəmi {total} maşın, səhifə {page}/{totalPages}
+              Total {total} cars, page {page}/{totalPages}
             </p>
             <div className="flex gap-2">
               <button
@@ -135,14 +133,14 @@ export default function CarsPage() {
                 disabled={page === 1}
                 className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
               >
-                Əvvəlki
+                 Previous
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
               >
-                Sonrakı
+                Next
               </button>
             </div>
           </div>

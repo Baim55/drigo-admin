@@ -31,12 +31,12 @@ export default function CarDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <p className="text-slate-500">Yüklənir...</p>;
+  if (loading) return <p className="text-slate-500">Loading...</p>;
 
   if (error) {
     return (
       <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-        Xəta: {error}
+        Error: {error}
       </div>
     );
   }
@@ -68,7 +68,7 @@ export default function CarDetailPage() {
         to="/cars"
         className="text-sm text-blue-600 hover:underline mb-4 inline-block"
       >
-        ← Maşınlara qayıt
+        ← Back to cars
       </Link>
 
       <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 overflow-hidden mb-6">
@@ -94,7 +94,7 @@ export default function CarDetailPage() {
                   : "bg-slate-100 text-slate-500 ring-1 ring-slate-200"
               }`}
             >
-              {car.isActive ? "Aktiv" : "Deaktiv"}
+              {car.isActive ? "Active" : "Inactive"}
             </span>
           </div>
         </div>
@@ -103,14 +103,14 @@ export default function CarDetailPage() {
       <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-            Texniki məlumat
+            Technical details
           </h2>
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
               className="text-xs font-medium text-blue-600 hover:underline"
             >
-              Redaktə et
+              Edit
             </button>
           ) : (
             <div className="flex gap-2">
@@ -118,14 +118,14 @@ export default function CarDetailPage() {
                 onClick={() => setIsEditing(false)}
                 className="text-xs font-medium text-slate-500 hover:underline"
               >
-                Ləğv et
+                Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
                 className="text-xs font-medium text-blue-600 hover:underline disabled:opacity-50"
               >
-                {saving ? "Saxlanılır..." : "Yadda saxla"}
+                {saving ? "Saving..." : "Save"}
               </button>
             </div>
           )}
@@ -133,24 +133,24 @@ export default function CarDetailPage() {
 
         {!isEditing ? (
           <dl className="space-y-2 text-sm">
-            <Row label="Ban tipi" value={car.bodyType} />
-            <Row label="Yanacaq növü" value={car.fuelTypeName} />
+            <Row label="Body type" value={car.bodyType} />
+            <Row label="Fuel type" value={car.fuelTypeName} />
             <Row
-              label="Yanacaq səviyyəsi"
+              label="Fuel level"
               value={`${car.fuelLevel.toFixed(1)} / ${car.fuelTankCapacity}`}
             />
-            <Row label="Oturacaq sayı" value={car.seats} />
-            <Row label="Maksimum sürət" value={`${car.maxSpeed} km/saat`} />
-            <Row label="Qiymət (gündəlik)" value={`${car.price} AED`} />
-            <Row label="Yürüş" value={`${car.distance.toFixed(1)} km`} />
-            <Row label="Şassi nömrəsi" value={car.chassisNumber} />
+            <Row label="Seats" value={car.seats} />
+            <Row label="Max speed" value={`${car.maxSpeed} km/h`} />
+            <Row label="Price (daily)" value={`${car.price} AED`} />
+            <Row label="Mileage" value={`${car.distance.toFixed(1)} km`} />
+            <Row label="Chassis number" value={car.chassisNumber} />
             <Row label="IMEI" value={car.imei} />
           </dl>
         ) : (
           <div className="space-y-3 text-sm">
             <div>
               <label className="block text-slate-500 mb-1">
-                Maksimum sürət (km/saat)
+                Max speed (km/h)
               </label>
               <input
                 type="number"
@@ -163,7 +163,7 @@ export default function CarDetailPage() {
             </div>
             <div>
               <label className="block text-slate-500 mb-1">
-                Qiymət (gündəlik, AED)
+                Price (daily, AED)
               </label>
               <input
                 type="number"
@@ -180,10 +180,10 @@ export default function CarDetailPage() {
 
       <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-          Xüsusiyyətlər
+          Features
         </h2>
         {car.carFeatures.length === 0 ? (
-          <p className="text-sm text-slate-400">Xüsusiyyət yoxdur.</p>
+          <p className="text-sm text-slate-400">No features.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {car.carFeatures.map((f) => (
@@ -200,10 +200,10 @@ export default function CarDetailPage() {
 
       <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-          Trip bitirmə üçün mövcud şəhərlər
+          Cities available for ending trip
         </h2>
         {car.endTripAvailableCities.length === 0 ? (
-          <p className="text-sm text-slate-400">Məlumat yoxdur.</p>
+          <p className="text-sm text-slate-400">No data.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {car.endTripAvailableCities.map((c) => (
