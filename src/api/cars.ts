@@ -25,3 +25,10 @@ export function getCars(params: GetCarsParams = {}) {
 export function getCarById(id: number) {
   return apiClient<CarDetail>(`/api/admin/cars/${id}`);
 }
+
+export function updateCar(id: number, data: Partial<CarDetail>) {
+  return apiClient<CarDetail>(`/api/admin/cars/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}

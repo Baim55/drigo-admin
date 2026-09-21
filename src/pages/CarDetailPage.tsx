@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getCarById } from "../api/cars";
+import { getCarById, updateCar } from "../api/cars";
 import type { CarDetail } from "../types/car";
 
 export default function CarDetailPage() {
@@ -8,12 +8,25 @@ export default function CarDetailPage() {
   const [car, setCar] = useState<CarDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [formData, setFormData] = useState({
+    maxSpeed: "0",
+    price: "0",
+  });
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
     getCarById(Number(id))
-      .then(setCar)
+      .then((data) => {
+        setCar(data);
+        setFormData({
+          maxSpeed: String(data.maxSpeed),
+          price: String(data.price),
+        });
+      })
       .catch((err) => setError((err as Error).message))
       .finally(() => setLoading(false));
   }, [id]);
@@ -29,6 +42,25 @@ export default function CarDetailPage() {
   }
 
   if (!car) return null;
+
+  async function handleSave() {
+    if (!id) return;
+    setSaving(true);
+    setError("");
+    try {
+      const payload = {
+        maxSpeed: Number(formData.maxSpeed),
+        price: Number(formData.price),
+      };
+      const updated = await updateCar(Number(id), payload);
+      setCar((prev) => (prev ? { ...prev, ...updated } : updated));
+      setIsEditing(false);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -68,11 +100,38 @@ export default function CarDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
             Texniki məlumat
           </h2>
+          {!isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-xs font-medium text-blue-600 hover:underline"
+            >
+              Redaktə et
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsEditing(false)}
+                className="text-xs font-medium text-slate-500 hover:underline"
+              >
+                Ləğv et
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="text-xs font-medium text-blue-600 hover:underline disabled:opacity-50"
+              >
+                {saving ? "Saxlanılır..." : "Yadda saxla"}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {!isEditing ? (
           <dl className="space-y-2 text-sm">
             <Row label="Ban tipi" value={car.bodyType} />
             <Row label="Yanacaq növü" value={car.fuelTypeName} />
@@ -82,28 +141,41 @@ export default function CarDetailPage() {
             />
             <Row label="Oturacaq sayı" value={car.seats} />
             <Row label="Maksimum sürət" value={`${car.maxSpeed} km/saat`} />
+            <Row label="Qiymət (gündəlik)" value={`${car.price} AED`} />
             <Row label="Yürüş" value={`${car.distance.toFixed(1)} km`} />
             <Row label="Şassi nömrəsi" value={car.chassisNumber} />
             <Row label="IMEI" value={car.imei} />
           </dl>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-            Qiymət və Lokasiya
-          </h2>
-          <dl className="space-y-2 text-sm">
-            <Row label="Qiymət (gündəlik)" value={`${car.price} AED`} />
-            <Row label="Ünvan" value={car.location.address} />
-            <Row label="Şəhər" value={car.location.city} />
-            <Row
-              label="Pulsuz parking"
-              value={car.freeParking ? "Var" : "Yox"}
-            />
-            <Row label="Pulsuz yanacaq" value={car.freeFuel ? "Var" : "Yox"} />
-            <Row label="Sığorta" value={car.insurance ? "Var" : "Yox"} />
-          </dl>
-        </div>
+        ) : (
+          <div className="space-y-3 text-sm">
+            <div>
+              <label className="block text-slate-500 mb-1">
+                Maksimum sürət (km/saat)
+              </label>
+              <input
+                type="number"
+                value={formData.maxSpeed}
+                onChange={(e) =>
+                  setFormData({ ...formData, maxSpeed: e.target.value })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-500 mb-1">
+                Qiymət (gündəlik, AED)
+              </label>
+              <input
+                type="number"
+                value={formData.price}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
