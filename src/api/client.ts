@@ -15,7 +15,7 @@ export async function apiClient<T>(
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.message || `Xeta: ${res.status}`);
+    throw new Error(errorBody.message || `Error: ${res.status}`);
   }
 
   return res.json();

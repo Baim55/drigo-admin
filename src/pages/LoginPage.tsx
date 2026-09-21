@@ -44,7 +44,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm bg-white rounded-xl shadow-md p-8">
         <h1 className="text-2xl font-bold text-slate-800 mb-1">DRIGO Admin</h1>
         <p className="text-sm text-slate-500 mb-6">
-          {step === "login" ? "Hesabına daxil ol" : "OTP kodu daxil et"}
+          {step === "login" ? "Sign in to your account" : "Enter your OTP code"}
         </p>
 
         {error && (
@@ -81,14 +81,14 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full rounded-md bg-blue-600 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {loading ? "Yüklənir..." : "Daxil ol"}
+              {loading ? "Loading..." : "Sign in"}
             </button>
           </form>
         ) : (
           <form onSubmit={handleVerify} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                OTP kodu
+                OTP code
               </label>
               <input
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -102,7 +102,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full rounded-md bg-blue-600 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {loading ? "Yoxlanılır..." : "Təsdiqlə"}
+              {loading ? "Verifying..." : "Verify"}
             </button>
           </form>
         )}

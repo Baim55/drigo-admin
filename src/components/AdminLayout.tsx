@@ -9,7 +9,7 @@ export default function AdminLayout() {
       await logout();
       navigate("/login");
     } catch (err) {
-      console.error("Çıxış zamanı xəta:", err);
+      console.error("Logout failed:", err);
     }
   };
 
@@ -25,13 +25,13 @@ export default function AdminLayout() {
             Dashboard
           </Link>
           <Link to="/cars" className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition">
-           Cars (Maşınlar)
+           Cars 
           </Link>
           <Link to="/rentals" className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition">
-            Rentals (İcarələr)
+            Rentals 
           </Link>
           <Link to="/customers" className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition">
-            Customers (Müştərilər)
+            Customers 
           </Link>
         </nav>
 
@@ -40,14 +40,14 @@ export default function AdminLayout() {
             onClick={handleLogout}
             className="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 rounded-md transition"
           >
-            Çıxış et
+            Logout
           </button>
         </div>
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-800">İdarəetmə Paneli</h2>
+          <h2 className="text-lg font-semibold text-slate-800">Admin Panel</h2>
           <span className="text-sm font-medium text-slate-600">Admin</span>
         </header>
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
