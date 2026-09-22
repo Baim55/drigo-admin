@@ -5,6 +5,7 @@ import AdminLayout from "../components/AdminLayout";
 import DashboardPage from "../pages/DashboardPage";
 import CarsPage from "../pages/CarsPage";
 import CarDetailPage from "../pages/CarDetailPage";
+import CarsTrackingPage from "../pages/CarsTrackingPage";
 
 export const router = createBrowserRouter([
   {
@@ -26,8 +27,12 @@ export const router = createBrowserRouter([
             element: <CarsPage />,
           },
           {
-            path: "/cars/:id", 
-            element: <CarDetailPage />, 
+            path: "/cars/tracking", 
+            element: <CarsTrackingPage />,
+          },
+          {
+            path: "/cars/:id",
+            element: <CarDetailPage />,
           },
         ],
       },

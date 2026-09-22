@@ -1,4 +1,4 @@
-import type { PaginatedResponse, Car, CarDetail } from "../types/car";
+import type { PaginatedResponse, Car, CarDetail, CarTrackingItem } from "../types/car";
 import { apiClient } from "./client";
 
 export interface GetCarsParams {
@@ -44,4 +44,8 @@ export function deleteCar(id: number) {
 
 export function toggleCarActive(id: number) {
   return apiClient<Car>(`/api/admin/cars/${id}/toggle-active`);
+}
+
+export function getCarsTracking() {
+  return apiClient<CarTrackingItem[]>("/api/admin/cars/tracking");
 }

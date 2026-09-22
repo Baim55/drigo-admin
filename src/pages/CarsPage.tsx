@@ -30,8 +30,15 @@ export default function CarsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Cars</h1>
-
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-slate-800">Cars</h1>
+        <Link
+          to="/cars/tracking"
+          className="text-sm font-medium text-blue-600 hover:underline"
+        >
+          View live map →
+        </Link>
+      </div>
       <div className="mb-4">
         <input
           placeholder="Search (brand, model...)"
@@ -133,7 +140,7 @@ export default function CarsPage() {
                 disabled={page === 1}
                 className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
               >
-                 Previous
+                Previous
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}

@@ -93,3 +93,20 @@ export interface CarDetail {
   includedParkingZones: ParkingZone[];
   includedGasStations: GasStation[];
 }
+
+export interface CarTrackingItem {
+  id: number;
+  plateNumber: string;
+  brandName: string;
+  modelName: string;
+  latitude: number;
+  longitude: number;
+  heading: number;
+  speed: number;
+  engineOn: boolean;
+  online: boolean;
+  fuelLevel: number;
+  activeRentalId: number | null;
+  status: string;
+  lastActivityAt: string;
+}
