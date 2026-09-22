@@ -2,42 +2,86 @@ import { useEffect, useState } from "react";
 import { getCars } from "../api/cars";
 import type { Car } from "../types/car";
 import { Link } from "react-router-dom";
+import CreateCarModal from "../components/CreateCarModal";
+
+type SortField = "manufactureYear" | "plateNumber" | "fuelLevel";
+type SortOrder = "asc" | "desc";
+
+const SORTABLE_COLUMNS: { field: SortField; label: string }[] = [
+  { field: "manufactureYear", label: "Year" },
+  { field: "plateNumber", label: "Plate" },
+  { field: "fuelLevel", label: "Fuel" },
+];
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<SortField | undefined>(undefined);
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const pageSize = 10;
 
-  useEffect(() => {
+  function fetchCars() {
     setLoading(true);
     setError("");
 
-    getCars({ page, pageSize, search: search || undefined })
+    getCars({
+      page,
+      pageSize,
+      search: search || undefined,
+      sortBy,
+      sortOrder,
+    })
       .then((res) => {
         setCars(res.data);
         setTotal(res.total);
       })
       .catch((err) => setError((err as Error).message))
       .finally(() => setLoading(false));
-  }, [page, search]);
+  }
+
+  useEffect(fetchCars, [page, search, sortBy, sortOrder]);
 
   const totalPages = Math.ceil(total / pageSize);
+
+  function handleSort(field: SortField) {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setPage(1);
+  }
+
+  function sortIndicator(field: SortField) {
+    if (sortBy !== field) return null;
+    return sortOrder === "asc" ? " ↑" : " ↓";
+  }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-slate-800">Cars</h1>
-        <Link
-          to="/cars/tracking"
-          className="text-sm font-medium text-blue-600 hover:underline"
-        >
-          View live map →
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/cars/tracking"
+            className="text-sm font-medium text-blue-600 hover:underline"
+          >
+            View live map →
+          </Link>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition"
+          >
+            + Add car
+          </button>
+        </div>
       </div>
       <div className="mb-4">
         <input
@@ -72,10 +116,17 @@ export default function CarsPage() {
                   <tr>
                     <th className="px-4 py-3 font-medium">ID</th>
                     <th className="px-4 py-3 font-medium">Brand / Model</th>
-                    <th className="px-4 py-3 font-medium">Year</th>
+                    {SORTABLE_COLUMNS.map((col) => (
+                      <th
+                        key={col.field}
+                        onClick={() => handleSort(col.field)}
+                        className="px-4 py-3 font-medium cursor-pointer select-none hover:text-slate-900"
+                      >
+                        {col.label}
+                        {sortIndicator(col.field)}
+                      </th>
+                    ))}
                     <th className="px-4 py-3 font-medium">Color</th>
-                    <th className="px-4 py-3 font-medium">Plate</th>
-                    <th className="px-4 py-3 font-medium">Fuel</th>
                     <th className="px-4 py-3 font-medium">Status</th>
                   </tr>
                 </thead>
@@ -100,17 +151,17 @@ export default function CarsPage() {
                         {car.manufactureYear}
                       </td>
                       <td className="px-4 py-3 text-slate-600">
+                        {car.plateNumber}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {car.fuelLevel.toFixed(0)}%
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
                         <span
                           className="inline-block w-3 h-3 rounded-full mr-2 align-middle border border-slate-200"
                           style={{ backgroundColor: car.colorHexCode }}
                         />
                         {car.colorName}
-                      </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {car.plateNumber}
-                      </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {car.fuelLevel.toFixed(0)}%
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -152,6 +203,13 @@ export default function CarsPage() {
             </div>
           </div>
         </>
+      )}
+
+      {showCreateModal && (
+        <CreateCarModal
+          onClose={() => setShowCreateModal(false)}
+          onCreated={fetchCars}
+        />
       )}
     </div>
   );

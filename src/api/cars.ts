@@ -29,6 +29,26 @@ export function getCarById(id: number) {
   return apiClient<CarDetail>(`/api/admin/cars/${id}`);
 }
 
+export interface CreateCarPayload {
+  brandId: number;
+  modelId: number;
+  colorId: number;
+  manufactureYear: number;
+  plateNumber: string;
+  chassisNumber: string;
+  imei: string;
+  maxSpeed: number;
+  price: number;
+  seats: number;
+}
+
+export function createCar(data: CreateCarPayload) {
+  return apiClient<CarDetail>("/api/admin/cars", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export function updateCar(id: number, data: Partial<CarDetail>) {
   return apiClient<CarDetail>(`/api/admin/cars/${id}`, {
     method: "PUT",
