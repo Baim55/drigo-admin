@@ -15,13 +15,13 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
-    return <div className="text-slate-500">Yüklənir...</div>;
+    return <div className="text-slate-500">Loading...</div>;
   }
 
   if (error) {
     return (
       <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-        Xəta: {error}
+        Error: {error}
       </div>
     );
   }
