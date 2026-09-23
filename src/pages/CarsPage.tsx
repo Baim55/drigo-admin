@@ -70,6 +70,12 @@ export default function CarsPage() {
         <h1 className="text-2xl font-bold text-slate-800">Cars</h1>
         <div className="flex items-center gap-4">
           <Link
+            to="/cars/problematic"
+            className="text-sm font-medium text-red-600 hover:underline"
+          >
+            Problematic cars
+          </Link>
+          <Link
             to="/cars/tracking"
             className="text-sm font-medium text-blue-600 hover:underline"
           >

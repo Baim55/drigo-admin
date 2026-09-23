@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { deleteCar, getCarById, toggleCarActive, updateCar } from "../api/cars";
+import {
+  deleteCar,
+  getCarById,
+  getCarStatus,
+  sendCarCommand,
+  toggleCarActive,
+  updateCar,
+  type CarCommand,
+  type CarStatus,
+} from "../api/cars";
 import type { CarDetail } from "../types/car";
 
 export default function CarDetailPage() {
@@ -14,6 +23,10 @@ export default function CarDetailPage() {
   const navigate = useNavigate();
   const [toggling, setToggling] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const [status, setStatus] = useState<CarStatus | null>(null);
+  const [statusError, setStatusError] = useState("");
+  const [sendingCommand, setSendingCommand] = useState<CarCommand | null>(null);
 
   const [formData, setFormData] = useState({
     maxSpeed: "0",
@@ -33,6 +46,13 @@ export default function CarDetailPage() {
       })
       .catch((err) => setError((err as Error).message))
       .finally(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    getCarStatus(Number(id))
+      .then(setStatus)
+      .catch((err) => setStatusError((err as Error).message));
   }, [id]);
 
   if (loading) return <p className="text-slate-500">Loading...</p>;
@@ -99,6 +119,21 @@ export default function CarDetailPage() {
     }
   }
 
+  async function handleSendCommand(command: CarCommand) {
+    if (!id) return;
+    setSendingCommand(command);
+    setStatusError("");
+    try {
+      await sendCarCommand(Number(id), command);
+      const updated = await getCarStatus(Number(id));
+      setStatus(updated);
+    } catch (err) {
+      setStatusError((err as Error).message);
+    } finally {
+      setSendingCommand(null);
+    }
+  }
+
   return (
     <div className="max-w-5xl mx-auto">
       <Link
@@ -152,7 +187,55 @@ export default function CarDetailPage() {
           </div>
         </div>
       </div>
+      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
+        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+          Live status & commands
+        </h2>
 
+        {statusError && (
+          <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600 mb-4">
+            Error: {statusError}
+          </div>
+        )}
+
+        {status ? (
+          <dl className="space-y-2 text-sm mb-4">
+            <Row label="Engine" value={status.engineOn ? "On" : "Off"} />
+            <Row
+              label="Doors locked"
+              value={status.doorsLocked ? "Yes" : "No"}
+            />
+            <Row label="Online" value={status.online ? "Yes" : "No"} />
+            <Row label="Speed" value={`${status.speed} km/h`} />
+            <Row label="Fuel level" value={`${status.fuelLevel.toFixed(1)}%`} />
+          </dl>
+        ) : (
+          <p className="text-sm text-slate-400 mb-4">Loading status...</p>
+        )}
+
+        <div className="flex flex-wrap gap-2">
+          <CommandButton
+            label="Lock"
+            active={sendingCommand === "lock"}
+            onClick={() => handleSendCommand("lock")}
+          />
+          <CommandButton
+            label="Unlock"
+            active={sendingCommand === "unlock"}
+            onClick={() => handleSendCommand("unlock")}
+          />
+          <CommandButton
+            label="Engine on"
+            active={sendingCommand === "engine_on"}
+            onClick={() => handleSendCommand("engine_on")}
+          />
+          <CommandButton
+            label="Engine off"
+            active={sendingCommand === "engine_off"}
+            onClick={() => handleSendCommand("engine_off")}
+          />
+        </div>
+      </div>
       <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
@@ -280,5 +363,25 @@ function Row({ label, value }: { label: string; value: string | number }) {
       <dt className="text-slate-500">{label}</dt>
       <dd className="font-medium text-slate-800">{value}</dd>
     </div>
+  );
+}
+
+function CommandButton({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={active}
+      className="text-xs font-medium px-3 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50 disabled:opacity-50 transition"
+    >
+      {active ? "Sending..." : label}
+    </button>
   );
 }

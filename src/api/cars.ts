@@ -1,4 +1,9 @@
-import type { PaginatedResponse, Car, CarDetail, CarTrackingItem } from "../types/car";
+import type {
+  PaginatedResponse,
+  Car,
+  CarDetail,
+  CarTrackingItem,
+} from "../types/car";
 import { apiClient } from "./client";
 
 export interface GetCarsParams {
@@ -68,4 +73,55 @@ export function toggleCarActive(id: number) {
 
 export function getCarsTracking() {
   return apiClient<CarTrackingItem[]>("/api/admin/cars/tracking");
+}
+
+export interface CarStatus {
+  carId: number;
+  engineOn: boolean;
+  online: boolean;
+  speed: number;
+  fuelLevel: number;
+  doorsLocked: boolean;
+  latitude: number;
+  longitude: number;
+  heading: number;
+  activeRentalId: number | null;
+}
+
+export interface CarLastActivity {
+  carId: number;
+  lastActivityAt: string;
+  online: boolean;
+  event: string;
+}
+
+export type CarCommand = "lock" | "unlock" | "engine_on" | "engine_off";
+
+export interface SendCommandResult {
+  success: boolean;
+  command: string;
+  acceptedAt: string;
+}
+
+export function getCarStatus(id: number) {
+  return apiClient<CarStatus>(`/api/admin/cars/${id}/status`);
+}
+
+export function getCarLastActivity(id: number) {
+  return apiClient<CarLastActivity>(`/api/admin/cars/${id}/last-activity`);
+}
+
+export function sendCarCommand(id: number, command: CarCommand) {
+  return apiClient<SendCommandResult>(`/api/admin/cars/${id}/send-command`, {
+    method: "POST",
+    body: JSON.stringify({ command }),
+  });
+}
+
+export interface ProblematicCar extends Car {
+  issues: string[];
+}
+
+export function getProblematicCars() {
+  return apiClient<ProblematicCar[]>("/api/admin/cars/problematic");
 }
