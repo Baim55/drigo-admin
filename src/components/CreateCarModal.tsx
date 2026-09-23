@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createCar } from "../api/cars";
+import { createCar, getCarFeatures } from "../api/cars";
 import type { CreateCarPayload } from "../api/cars";
 import { getBrands, getBrandModels, getBrandColors } from "../api/brands";
 import type { Brand, BrandModel, BrandColor } from "../api/brands";
@@ -33,14 +33,21 @@ export default function CreateCarModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // load brand list on mount
+  const [allFeatures, setAllFeatures] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [selectedFeatureIds, setSelectedFeatureIds] = useState<number[]>([]);
+
   useEffect(() => {
     getBrands()
       .then((res) => setBrands(res.data))
-      .catch((err) => setError((err as Error).message));
+      .catch((err) => setError(err.message));
+
+    getCarFeatures()
+      .then(setAllFeatures)
+      .catch(() => {});
   }, []);
 
-  // when brand changes, load its models and colors
   useEffect(() => {
     if (!brandId) {
       setModels([]);
@@ -59,7 +66,6 @@ export default function CreateCarModal({
     setColorId("");
   }, [brandId]);
 
-  // when model changes, prefill seats/maxSpeed from that model
   useEffect(() => {
     const selected = models.find((m) => m.id === modelId);
     if (selected) {
@@ -88,6 +94,7 @@ export default function CreateCarModal({
       maxSpeed,
       seats,
       price,
+      carFeatureIds: selectedFeatureIds,
     };
 
     setSaving(true);
@@ -239,6 +246,41 @@ export default function CreateCarModal({
                 className="input"
               />
             </Field>
+            <div className="col-span-2">
+              <span className="block text-slate-500 mb-1 text-sm">
+                Car Features
+              </span>
+              <div className="flex flex-wrap gap-3 max-h-32 overflow-y-auto p-2 border border-slate-200 rounded-md">
+                {allFeatures.map((feat) => {
+                  const isChecked = selectedFeatureIds.includes(feat.id);
+                  return (
+                    <label
+                      key={feat.id}
+                      className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedFeatureIds([
+                              ...selectedFeatureIds,
+                              feat.id,
+                            ]);
+                          } else {
+                            setSelectedFeatureIds(
+                              selectedFeatureIds.filter((id) => id !== feat.id),
+                            );
+                          }
+                        }}
+                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      {feat.name}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">

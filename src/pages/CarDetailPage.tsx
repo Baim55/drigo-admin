@@ -29,8 +29,13 @@ export default function CarDetailPage() {
   const [sendingCommand, setSendingCommand] = useState<CarCommand | null>(null);
 
   const [formData, setFormData] = useState({
-    maxSpeed: "0",
-    price: "0",
+    maxSpeed: "",
+    price: "",
+    plateNumber: "",
+    manufactureYear: "",
+    chassisNumber: "",
+    transmission: "",
+    distance: "",
   });
 
   useEffect(() => {
@@ -40,8 +45,13 @@ export default function CarDetailPage() {
       .then((data) => {
         setCar(data);
         setFormData({
-          maxSpeed: String(data.maxSpeed),
-          price: String(data.price),
+          maxSpeed: String(data.maxSpeed || ""),
+          price: String(data.price || ""),
+          plateNumber: data.plateNumber || "",
+          manufactureYear: String(data.manufactureYear || ""),
+          chassisNumber: data.chassisNumber || "",
+          transmission: data.transmission || "",
+          distance: String(data.distance || ""),
         });
       })
       .catch((err) => setError((err as Error).message))
@@ -75,6 +85,11 @@ export default function CarDetailPage() {
       const payload = {
         maxSpeed: Number(formData.maxSpeed),
         price: Number(formData.price),
+        plateNumber: formData.plateNumber,
+        manufactureYear: Number(formData.manufactureYear),
+        chassisNumber: formData.chassisNumber,
+        transmission: Number(formData.transmission),
+        distance: Number(formData.distance),
       };
       const updated = await updateCar(Number(id), payload);
       setCar((prev) => (prev ? { ...prev, ...updated } : updated));
@@ -281,6 +296,7 @@ export default function CarDetailPage() {
             <Row label="Mileage" value={`${car.distance.toFixed(1)} km`} />
             <Row label="Chassis number" value={car.chassisNumber} />
             <Row label="IMEI" value={car.imei} />
+            <Row label="Transmission" value={car.transmission || "N/A"} />
           </dl>
         ) : (
           <div className="space-y-3 text-sm">
@@ -293,6 +309,68 @@ export default function CarDetailPage() {
                 value={formData.maxSpeed}
                 onChange={(e) =>
                   setFormData({ ...formData, maxSpeed: e.target.value })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-500 mb-1">Plate number</label>
+              <input
+                type="text"
+                value={formData.plateNumber}
+                onChange={(e) =>
+                  setFormData({ ...formData, plateNumber: e.target.value })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-500 mb-1">
+                Manufacture Year
+              </label>
+              <input
+                type="number"
+                value={formData.manufactureYear}
+                onChange={(e) =>
+                  setFormData({ ...formData, manufactureYear: e.target.value })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-500 mb-1">
+                Chassis number
+              </label>
+              <input
+                type="text"
+                value={formData.chassisNumber}
+                onChange={(e) =>
+                  setFormData({ ...formData, chassisNumber: e.target.value })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-500 mb-1">Transmission</label>
+              <select
+                value={formData.transmission}
+                onChange={(e) =>
+                  setFormData({ ...formData, transmission: e.target.value })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option value="">Select transmission</option>
+                <option value="0">Automatic</option>
+                <option value="1">Manual</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-slate-500 mb-1">Mileage (km)</label>
+              <input
+                type="number"
+                value={formData.distance}
+                onChange={(e) =>
+                  setFormData({ ...formData, distance: e.target.value })
                 }
                 className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

@@ -3,6 +3,7 @@ import type {
   Car,
   CarDetail,
   CarTrackingItem,
+  CarFeature,
 } from "../types/car";
 import { apiClient } from "./client";
 
@@ -45,6 +46,7 @@ export interface CreateCarPayload {
   maxSpeed: number;
   price: number;
   seats: number;
+  carFeatureIds?: number[];
 }
 
 export function createCar(data: CreateCarPayload) {
@@ -73,6 +75,10 @@ export function toggleCarActive(id: number) {
 
 export function getCarsTracking() {
   return apiClient<CarTrackingItem[]>("/api/admin/cars/tracking");
+}
+
+export function getCarFeatures() {
+  return apiClient<CarFeature[]>("/api/admin/cars/car-features");
 }
 
 export interface CarStatus {
