@@ -28,7 +28,6 @@ export default function CreateCarModal({
   const [imei, setImei] = useState("");
   const [maxSpeed, setMaxSpeed] = useState(180);
   const [seats, setSeats] = useState(5);
-  const [price, setPrice] = useState(100);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -41,7 +40,7 @@ export default function CreateCarModal({
   useEffect(() => {
     getBrands()
       .then((res) => setBrands(res.data))
-      .catch((err) => setError(err.message));
+      .catch((err) => setError((err as Error).message));
 
     getCarFeatures()
       .then(setAllFeatures)
@@ -93,7 +92,6 @@ export default function CreateCarModal({
       imei,
       maxSpeed,
       seats,
-      price,
       carFeatureIds: selectedFeatureIds,
     };
 
@@ -135,7 +133,7 @@ export default function CreateCarModal({
                 required
                 value={brandId}
                 onChange={(e) => setBrandId(Number(e.target.value))}
-                className="select"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 disabled:text-slate-400 bg-white"
               >
                 <option value="">Select brand</option>
                 {brands.map((b) => (
@@ -152,7 +150,7 @@ export default function CreateCarModal({
                 value={modelId}
                 onChange={(e) => setModelId(Number(e.target.value))}
                 disabled={!brandId}
-                className="select"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 disabled:text-slate-400 bg-white"
               >
                 <option value="">Select model</option>
                 {models.map((m) => (
@@ -169,7 +167,7 @@ export default function CreateCarModal({
                 value={colorId}
                 onChange={(e) => setColorId(Number(e.target.value))}
                 disabled={!brandId}
-                className="select"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 disabled:text-slate-400 bg-white"
               >
                 <option value="">Select color</option>
                 {colors.map((c) => (
@@ -186,7 +184,7 @@ export default function CreateCarModal({
                 required
                 value={manufactureYear}
                 onChange={(e) => setManufactureYear(Number(e.target.value))}
-                className="input"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </Field>
 
@@ -195,7 +193,7 @@ export default function CreateCarModal({
                 required
                 value={plateNumber}
                 onChange={(e) => setPlateNumber(e.target.value)}
-                className="input"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </Field>
 
@@ -204,7 +202,7 @@ export default function CreateCarModal({
                 required
                 value={chassisNumber}
                 onChange={(e) => setChassisNumber(e.target.value)}
-                className="input"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </Field>
 
@@ -213,7 +211,7 @@ export default function CreateCarModal({
                 required
                 value={imei}
                 onChange={(e) => setImei(e.target.value)}
-                className="input"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </Field>
 
@@ -223,7 +221,7 @@ export default function CreateCarModal({
                 required
                 value={seats}
                 onChange={(e) => setSeats(Number(e.target.value))}
-                className="input"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </Field>
 
@@ -233,19 +231,10 @@ export default function CreateCarModal({
                 required
                 value={maxSpeed}
                 onChange={(e) => setMaxSpeed(Number(e.target.value))}
-                className="input"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </Field>
 
-            <Field label="Price (daily, AED)">
-              <input
-                type="number"
-                required
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
-                className="input"
-              />
-            </Field>
             <div className="col-span-2">
               <span className="block text-slate-500 mb-1 text-sm">
                 Car Features

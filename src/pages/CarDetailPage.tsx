@@ -30,7 +30,6 @@ export default function CarDetailPage() {
 
   const [formData, setFormData] = useState({
     maxSpeed: "",
-    price: "",
     plateNumber: "",
     manufactureYear: "",
     chassisNumber: "",
@@ -46,11 +45,11 @@ export default function CarDetailPage() {
         setCar(data);
         setFormData({
           maxSpeed: String(data.maxSpeed || ""),
-          price: String(data.price || ""),
           plateNumber: data.plateNumber || "",
           manufactureYear: String(data.manufactureYear || ""),
           chassisNumber: data.chassisNumber || "",
-          transmission: data.transmission || "",
+          transmission:
+            data.transmission !== undefined ? String(data.transmission) : "",
           distance: String(data.distance || ""),
         });
       })
@@ -82,17 +81,28 @@ export default function CarDetailPage() {
     setSaving(true);
     setError("");
     try {
-      const payload = {
+      const payload: Record<string, unknown> = {
         maxSpeed: Number(formData.maxSpeed),
-        price: Number(formData.price),
         plateNumber: formData.plateNumber,
         manufactureYear: Number(formData.manufactureYear),
         chassisNumber: formData.chassisNumber,
-        transmission: Number(formData.transmission),
         distance: Number(formData.distance),
       };
-      const updated = await updateCar(Number(id), payload);
-      setCar((prev) => (prev ? { ...prev, ...updated } : updated));
+      if (formData.transmission !== "") {
+        payload.transmission = Number(formData.transmission);
+      }
+      await updateCar(Number(id), payload);
+      const fresh = await getCarById(Number(id));
+      setCar(fresh);
+      setFormData({
+        maxSpeed: String(fresh.maxSpeed || ""),
+        plateNumber: fresh.plateNumber || "",
+        manufactureYear: String(fresh.manufactureYear || ""),
+        chassisNumber: fresh.chassisNumber || "",
+        transmission:
+          fresh.transmission !== undefined ? String(fresh.transmission) : "",
+        distance: String(fresh.distance || ""),
+      });
       setIsEditing(false);
     } catch (err) {
       setError((err as Error).message);
@@ -296,7 +306,16 @@ export default function CarDetailPage() {
             <Row label="Mileage" value={`${car.distance.toFixed(1)} km`} />
             <Row label="Chassis number" value={car.chassisNumber} />
             <Row label="IMEI" value={car.imei} />
-            <Row label="Transmission" value={car.transmission || "N/A"} />
+            <Row
+              label="Transmission"
+              value={
+                car.transmission === 0
+                  ? "Automatic"
+                  : car.transmission === 1
+                    ? "Manual"
+                    : "N/A"
+              }
+            />
           </dl>
         ) : (
           <div className="space-y-3 text-sm">
@@ -371,19 +390,6 @@ export default function CarDetailPage() {
                 value={formData.distance}
                 onChange={(e) =>
                   setFormData({ ...formData, distance: e.target.value })
-                }
-                className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-slate-500 mb-1">
-                Price (daily, AED)
-              </label>
-              <input
-                type="number"
-                value={formData.price}
-                onChange={(e) =>
-                  setFormData({ ...formData, price: e.target.value })
                 }
                 className="w-full rounded-md border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

@@ -44,7 +44,6 @@ export interface CreateCarPayload {
   chassisNumber: string;
   imei: string;
   maxSpeed: number;
-  price: number;
   seats: number;
   carFeatureIds?: number[];
 }
