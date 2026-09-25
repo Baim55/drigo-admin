@@ -1,4 +1,4 @@
-import type { PaginatedResponse, Rental, RentalStatus } from "../types/rental";
+import type { PaginatedResponse, Rental, RentalDetail, RentalStatus } from "../types/rental";
 import { apiClient } from "./client";
 
 export interface GetRentalsParams {
@@ -23,4 +23,12 @@ export function getRentals(params: GetRentalsParams = {}) {
   return apiClient<PaginatedResponse<Rental>>(
     `/api/admin/rentals?${query.toString()}`,
   );
+}
+
+export function getRentalById(id: number) {
+  return apiClient<RentalDetail>(`/api/admin/rentals/${id}`);
+}
+
+export function endRental(id: number) {
+  return apiClient<RentalDetail>(`/api/admin/rentals/${id}/end`);
 }

@@ -48,3 +48,60 @@ export interface Rental {
   extraKmDistance: number;
   debtPaidAmount: number;
 }
+
+export interface RentalTariff {
+  id: number;
+  packageName: string;
+  unitCount: number;
+  timeUnit: string;
+  activePrice: number;
+  includedDistance: number;
+}
+
+export interface RentalInsurance {
+  id: number;
+  name: string;
+  dailyPrice: number;
+  deductible: number;
+}
+
+export interface RentalActionHistoryItem {
+  id: number;
+  action: string;
+  at: string;
+  by: string;
+  note: string | null;
+}
+
+export interface RentalHistoryItem {
+  id: number;
+  status: RentalStatus;
+  startDate: string;
+  endDate: string | null;
+  totalPrice: number;
+}
+
+export interface RentalDetail extends Rental {
+  tariff: RentalTariff | null;
+  insurance: RentalInsurance | null;
+  freeTimeEnd: string | null;
+  nextPaymentDue: string | null;
+  lastPaymentAt: string | null;
+  isPackageExpired: boolean;
+  totalDebt: number;
+  debts: unknown[];
+  actionHistory: RentalActionHistoryItem[];
+  userRentalHistory: RentalHistoryItem[];
+  startPhotoUrls: string[];
+  endPhotoUrls: string[];
+  paymentRetryState: PaymentRetryState | null;
+  cancelReason: string | null;
+  hasAccident: boolean;
+}
+
+export interface PaymentRetryState {
+  attempts: number;
+  lastError: string;
+  nextRetryAt: string | null;
+  amountDue: number;
+}
