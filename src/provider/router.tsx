@@ -10,6 +10,7 @@ import ProblematicCarsPage from "../pages/ProblematicCarsPage";
 import RentalsPage from "../pages/RentalsPage";
 import RentalDetailPage from "../pages/RentalDetailPage";
 import CustomersPage from "../pages/CustomersPage";
+import CustomerDetailPage from "../pages/CustomerDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ export const router = createBrowserRouter([
           {
             path: "/rentals/:id",
             element: <RentalDetailPage />,
+          },
+          {
+            path: "/customers/:id",
+            element: <CustomerDetailPage />,
           },
         ],
       },

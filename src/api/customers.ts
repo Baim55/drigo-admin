@@ -1,4 +1,4 @@
-import type { PaginatedResponse, Customer } from "../types/customer";
+import type { PaginatedResponse, Customer, CustomerDetail } from "../types/customer";
 import { apiClient } from "./client";
 
 export interface GetCustomersParams {
@@ -24,5 +24,17 @@ export function getCustomers(params: GetCustomersParams = {}) {
 }
 
 export function getCustomerById(id: string) {
-  return apiClient<Customer>(`/api/admin/users/${id}`);
+  return apiClient<CustomerDetail>(`/api/admin/users/${id}`);
+}
+
+export interface VerifyPayload {
+  approve: boolean;
+  rejectionReason?: string;
+}
+
+export function verifyCustomer(id: string, payload: VerifyPayload) {
+  return apiClient<CustomerDetail>(`/api/admin/users/${id}/verify`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
 }
