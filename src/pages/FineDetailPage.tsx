@@ -119,6 +119,17 @@ export default function FineDetailPage() {
               )
             }
           />
+          <Row
+            label="Customer"
+            value={
+              <Link
+                to={`/debts/${fine.userId}`}
+                className="text-blue-600 hover:underline"
+              >
+                View debts
+              </Link>
+            }
+          />
           <Row label="Source" value={fine.source} />
           <Row label="Location" value={fine.location} />
           <Row
