@@ -57,6 +57,12 @@ export default function AdminLayout() {
           >
             Fines
           </Link>
+          <Link
+            to="/reservations"
+            className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition"
+          >
+            Reservations
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">

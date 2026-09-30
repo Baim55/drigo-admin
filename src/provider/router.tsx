@@ -15,6 +15,8 @@ import DebtorsPage from "../pages/DebtorsPage";
 import DebtorDetailPage from "../pages/DebtorDetailPage";
 import FineDetailPage from "../pages/FineDetailPage";
 import FinesPage from "../pages/FinesPage";
+import ReservationsPage from "../pages/ReservationsPage";
+import ReservationDetailPage from "../pages/ReservationDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +62,10 @@ export const router = createBrowserRouter([
             element: <FinesPage />,
           },
           {
+            path: "/reservations",
+            element: <ReservationsPage />,
+          },
+          {
             path: "/cars/:id",
             element: <CarDetailPage />,
           },
@@ -78,6 +84,10 @@ export const router = createBrowserRouter([
           {
             path: "/fines/:id",
             element: <FineDetailPage />,
+          },
+          {
+            path: "/reservations/:id",
+            element: <ReservationDetailPage />,
           },
         ],
       },
