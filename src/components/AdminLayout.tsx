@@ -63,6 +63,12 @@ export default function AdminLayout() {
           >
             Reservations
           </Link>
+          <Link
+            to="/support"
+            className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition"
+          >
+            Supports
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">
