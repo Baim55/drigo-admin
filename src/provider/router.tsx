@@ -7,6 +7,8 @@ import CarsPage from "../pages/CarsPage";
 import CarDetailPage from "../pages/CarDetailPage";
 import CarsTrackingPage from "../pages/CarsTrackingPage";
 import ProblematicCarsPage from "../pages/ProblematicCarsPage";
+import RentalsPage from "../pages/RentalsPage";
+import RentalDetailPage from "../pages/RentalDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -36,8 +38,16 @@ export const router = createBrowserRouter([
             element: <ProblematicCarsPage />,
           },
           {
+            path: "/rentals",
+            element: <RentalsPage />,
+          },
+          {
             path: "/cars/:id",
             element: <CarDetailPage />,
+          },
+          {
+            path: "/rentals/:id",
+            element: <RentalDetailPage />,
           },
         ],
       },
