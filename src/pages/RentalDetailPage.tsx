@@ -67,7 +67,7 @@ export default function RentalDetailPage() {
   const canEnd = rental.status === "Active" || rental.status === "Started";
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       <Link
         to="/rentals"
         className="text-sm text-blue-600 hover:underline mb-4 inline-block"
