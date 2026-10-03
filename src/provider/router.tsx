@@ -9,6 +9,8 @@ import CarsTrackingPage from "../pages/CarsTrackingPage";
 import ProblematicCarsPage from "../pages/ProblematicCarsPage";
 import RentalsPage from "../pages/RentalsPage";
 import RentalDetailPage from "../pages/RentalDetailPage";
+import CustomersPage from "../pages/CustomersPage";
+import CustomerDetailPage from "../pages/CustomerDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -42,12 +44,20 @@ export const router = createBrowserRouter([
             element: <RentalsPage />,
           },
           {
+            path: "/customers",
+            element: <CustomersPage />,
+          },
+          {
             path: "/cars/:id",
             element: <CarDetailPage />,
           },
           {
             path: "/rentals/:id",
             element: <RentalDetailPage />,
+          },
+          {
+            path: "/customers/:id",
+            element: <CustomerDetailPage />,
           },
         ],
       },
