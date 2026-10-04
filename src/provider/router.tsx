@@ -11,6 +11,8 @@ import RentalsPage from "../pages/RentalsPage";
 import RentalDetailPage from "../pages/RentalDetailPage";
 import CustomersPage from "../pages/CustomersPage";
 import CustomerDetailPage from "../pages/CustomerDetailPage";
+import DebtorsPage from "../pages/DebtorsPage";
+import DebtorDetailPage from "../pages/DebtorDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +50,10 @@ export const router = createBrowserRouter([
             element: <CustomersPage />,
           },
           {
+            path: "/debts",
+            element: <DebtorsPage />,
+          },
+          {
             path: "/cars/:id",
             element: <CarDetailPage />,
           },
@@ -58,6 +64,10 @@ export const router = createBrowserRouter([
           {
             path: "/customers/:id",
             element: <CustomerDetailPage />,
+          },
+          {
+            path: "/debts/:id",
+            element: <DebtorDetailPage />,
           },
         ],
       },
