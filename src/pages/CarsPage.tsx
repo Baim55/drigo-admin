@@ -6,6 +6,7 @@ import CreateCarModal from "../components/CreateCarModal";
 
 type SortField = "manufactureYear" | "plateNumber" | "fuelLevel";
 type SortOrder = "asc" | "desc";
+type ActiveFilter = "all" | "active" | "inactive";
 
 const SORTABLE_COLUMNS: { field: SortField; label: string }[] = [
   { field: "manufactureYear", label: "Year" },
@@ -13,41 +14,69 @@ const SORTABLE_COLUMNS: { field: SortField; label: string }[] = [
   { field: "fuelLevel", label: "Fuel" },
 ];
 
+const PAGE_SIZE = 10;
+
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+
   const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [activeFilter, setActiveFilter] = useState<ActiveFilter>("all");
   const [sortBy, setSortBy] = useState<SortField | undefined>(undefined);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const pageSize = 10;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  function fetchCars() {
+  useEffect(() => {
+    let ignore = false;
     setLoading(true);
     setError("");
 
     getCars({
       page,
-      pageSize,
+      pageSize: PAGE_SIZE,
       search: search || undefined,
       sortBy,
       sortOrder,
     })
       .then((res) => {
+        if (ignore) return;
         setCars(res.data);
         setTotal(res.total);
       })
-      .catch((err) => setError((err as Error).message))
-      .finally(() => setLoading(false));
-  }
+      .catch((err) => {
+        if (!ignore) setError((err as Error).message);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [page, search, activeFilter, sortBy, sortOrder, refreshKey]);
 
-  useEffect(fetchCars, [page, search, sortBy, sortOrder]);
+  // NOTE: Backend's GET /cars endpoint does not filter by `isActive`
+  // (verified manually: ?isActive=true and ?isActive=false return identical
+  // data). Falling back to client-side filtering on the current page.
+  const filteredCars =
+    activeFilter === "all"
+      ? cars
+      : cars.filter((c) => c.isActive === (activeFilter === "active"));
 
-  const totalPages = Math.ceil(total / pageSize);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   function handleSort(field: SortField) {
     if (sortBy === field) {
@@ -62,6 +91,11 @@ export default function CarsPage() {
   function sortIndicator(field: SortField) {
     if (sortBy !== field) return null;
     return sortOrder === "asc" ? " ↑" : " ↓";
+  }
+
+  function handleCreated() {
+    setPage(1);
+    setRefreshKey((k) => k + 1);
   }
 
   return (
@@ -89,33 +123,55 @@ export default function CarsPage() {
           </button>
         </div>
       </div>
-      <div className="mb-4">
+
+      <div className="flex flex-wrap items-center gap-3 mb-4">
         <input
-          placeholder="Search (brand, model...)"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
+          placeholder="Search (brand, model, plate...)"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           className="w-full max-w-sm rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <select
+          value={activeFilter}
+          onChange={(e) => {
+            setActiveFilter(e.target.value as ActiveFilter);
+            setPage(1);
+          }}
+          className="rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
-      {loading && <p className="text-slate-500">Loading...</p>}
-
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Error: {error}
+        <div className="flex items-center justify-between rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
+          <span>Error: {error}</span>
+          <button
+            onClick={() => setRefreshKey((k) => k + 1)}
+            className="font-medium underline"
+          >
+            Retry
+          </button>
         </div>
       )}
 
-      {!loading && !error && cars.length === 0 && (
+      {loading && filteredCars.length === 0 && (
+        <p className="text-slate-500">Loading...</p>
+      )}
+
+      {!loading && !error && filteredCars.length === 0 && (
         <p className="text-slate-500">No cars found.</p>
       )}
 
-      {!loading && !error && cars.length > 0 && (
+      {filteredCars.length > 0 && (
         <>
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div
+            className={`bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-opacity ${
+              loading ? "opacity-50" : ""
+            }`}
+          >
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 text-slate-600 text-left border-b border-slate-200">
@@ -137,15 +193,15 @@ export default function CarsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {cars.map((car) => (
+                  {filteredCars.map((car) => (
                     <tr
                       key={car.id}
                       className="hover:bg-slate-50/70 transition-colors"
                     >
-                      <td className="px-5 py-4 text-slate-400 font-mono text-xs">
+                      <td className="px-4 py-3 text-slate-400 font-mono text-xs">
                         #{car.id}
                       </td>
-                      <td className="px-5 py-4 font-semibold text-slate-800">
+                      <td className="px-4 py-3 font-semibold text-slate-800">
                         <Link
                           to={`/cars/${car.id}`}
                           className="hover:text-blue-600 hover:underline"
@@ -170,15 +226,22 @@ export default function CarsPage() {
                         {car.colorName}
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            car.isActive
-                              ? "bg-green-100 text-green-700"
-                              : "bg-slate-100 text-slate-600"
-                          }`}
-                        >
-                          {car.isActive ? "Active" : "Inactive"}
-                        </span>
+                        <div className="flex gap-1">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              car.isActive
+                                ? "bg-green-100 text-green-700"
+                                : "bg-slate-100 text-slate-600"
+                            }`}
+                          >
+                            {car.isActive ? "Active" : "Inactive"}
+                          </span>
+                          {car.activeRentalId !== null && (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                              Rented
+                            </span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -189,19 +252,20 @@ export default function CarsPage() {
 
           <div className="flex items-center justify-between mt-4">
             <p className="text-sm text-slate-500">
-              Total {total} cars, page {page}/{totalPages}
+              Showing {filteredCars.length} of {total} cars, page {page}/
+              {totalPages}
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
+                disabled={page === 1 || loading}
                 className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
+                disabled={page >= totalPages || loading}
                 className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
               >
                 Next
@@ -214,7 +278,7 @@ export default function CarsPage() {
       {showCreateModal && (
         <CreateCarModal
           onClose={() => setShowCreateModal(false)}
-          onCreated={fetchCars}
+          onCreated={handleCreated}
         />
       )}
     </div>
