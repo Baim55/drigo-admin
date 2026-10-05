@@ -160,7 +160,7 @@ export default function CarDetailPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       <Link
         to="/cars"
         className="text-sm text-blue-600 hover:underline mb-4 inline-block"
