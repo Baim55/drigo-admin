@@ -51,6 +51,12 @@ export default function AdminLayout() {
           >
             Debts
           </Link>
+          <Link
+            to="/fines"
+            className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition"
+          >
+            Fines
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">

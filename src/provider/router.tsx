@@ -13,6 +13,8 @@ import CustomersPage from "../pages/CustomersPage";
 import CustomerDetailPage from "../pages/CustomerDetailPage";
 import DebtorsPage from "../pages/DebtorsPage";
 import DebtorDetailPage from "../pages/DebtorDetailPage";
+import FineDetailPage from "../pages/FineDetailPage";
+import FinesPage from "../pages/FinesPage";
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +56,10 @@ export const router = createBrowserRouter([
             element: <DebtorsPage />,
           },
           {
+            path: "/fines",
+            element: <FinesPage />,
+          },
+          {
             path: "/cars/:id",
             element: <CarDetailPage />,
           },
@@ -68,6 +74,10 @@ export const router = createBrowserRouter([
           {
             path: "/debts/:id",
             element: <DebtorDetailPage />,
+          },
+          {
+            path: "/fines/:id",
+            element: <FineDetailPage />,
           },
         ],
       },
