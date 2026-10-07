@@ -20,6 +20,7 @@ import ReservationDetailPage from "../pages/ReservationDetailPage";
 import SupportPage from "../pages/SupportPage";
 import SupportDetailPage from "../pages/SupportDetailPage";
 import AnalyticsPage from "../pages/AnalyticsPage";
+import TariffsPage from "../pages/TariffsPage";
 
 export const router = createBrowserRouter([
   {
@@ -75,6 +76,10 @@ export const router = createBrowserRouter([
           {
             path: "/analytics",
             element: <AnalyticsPage />,
+          },
+          {
+            path: "/tariffs",
+            element: <TariffsPage />,
           },
           {
             path: "/cars/:id",
