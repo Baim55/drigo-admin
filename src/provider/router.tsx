@@ -21,6 +21,7 @@ import SupportPage from "../pages/SupportPage";
 import SupportDetailPage from "../pages/SupportDetailPage";
 import AnalyticsPage from "../pages/AnalyticsPage";
 import TariffsPage from "../pages/TariffsPage";
+import DiscountsPage from "../pages/DiscountsPage";
 
 export const router = createBrowserRouter([
   {
@@ -80,6 +81,11 @@ export const router = createBrowserRouter([
           {
             path: "/tariffs",
             element: <TariffsPage />,
+          },
+
+          {
+            path: "/discounts",
+            element: <DiscountsPage />,
           },
           {
             path: "/cars/:id",
