@@ -93,6 +93,12 @@ export default function AdminLayout() {
           >
             Settings
           </Link>
+          <Link
+            to="/geozones"
+            className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition"
+          >
+            Geozones
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">
