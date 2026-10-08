@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getRentalById, endRental } from "../api/rentals";
 import type { RentalDetail } from "../types/rental";
+import PaymentsCard from "../components/PaymentsCard";
 
 const STATUS_STYLES: Record<string, string> = {
   Active: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
@@ -198,6 +199,8 @@ export default function RentalDetailPage() {
           </dl>
         </div>
       </div>
+
+      <PaymentsCard userId={rental.user.id} onChanged={loadRental} />
 
       <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
