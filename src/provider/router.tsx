@@ -22,6 +22,7 @@ import SupportDetailPage from "../pages/SupportDetailPage";
 import AnalyticsPage from "../pages/AnalyticsPage";
 import TariffsPage from "../pages/TariffsPage";
 import DiscountsPage from "../pages/DiscountsPage";
+import SettingsPage from "../pages/SettingsPage";
 
 export const router = createBrowserRouter([
   {
@@ -82,10 +83,13 @@ export const router = createBrowserRouter([
             path: "/tariffs",
             element: <TariffsPage />,
           },
-
           {
             path: "/discounts",
             element: <DiscountsPage />,
+          },
+          {
+            path: "/settings",
+            element: <SettingsPage />,
           },
           {
             path: "/cars/:id",

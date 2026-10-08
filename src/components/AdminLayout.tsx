@@ -87,6 +87,12 @@ export default function AdminLayout() {
           >
             Discounts
           </Link>
+          <Link
+            to="/settings"
+            className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition"
+          >
+            Settings
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">
