@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getUserDebts, payAllDebts } from "../api/debts";
+import { getUserDebts, payAllDebts, payDebt, splitDebt } from "../api/debts";
 import type { UserDebtSummary } from "../types/debt";
 
 export default function DebtorDetailPage() {
@@ -9,6 +9,9 @@ export default function DebtorDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [paying, setPaying] = useState(false);
+
+  const [actionId, setActionId] = useState<number | null>(null);
+  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -43,6 +46,53 @@ export default function DebtorDetailPage() {
     }
   }
 
+  async function handlePayOne(debtId: number) {
+    if (!id) return;
+    const confirmed = window.confirm("Mark this debt as paid?");
+    if (!confirmed) return;
+
+    setActionId(debtId);
+    setActionError("");
+    try {
+      await payDebt(id, debtId);
+      loadDebts();
+    } catch (err) {
+      setActionError((err as Error).message);
+    } finally {
+      setActionId(null);
+    }
+  }
+
+  async function handleSplit(debtId: number) {
+    if (!id) return;
+    const input = window.prompt(
+      "Split into how many installments? (2-12)",
+      "2",
+    );
+    if (input === null) return;
+
+    const installments = Number(input);
+    if (
+      !Number.isInteger(installments) ||
+      installments < 2 ||
+      installments > 12
+    ) {
+      setActionError("Installments must be a whole number between 2 and 12.");
+      return;
+    }
+
+    setActionId(debtId);
+    setActionError("");
+    try {
+      await splitDebt(id, debtId, installments);
+      loadDebts();
+    } catch (err) {
+      setActionError((err as Error).message);
+    } finally {
+      setActionId(null);
+    }
+  }
+
   if (loading) return <p className="text-slate-500">Loading...</p>;
 
   if (error) {
@@ -59,7 +109,7 @@ export default function DebtorDetailPage() {
   const paidDebts = summary.debts.filter((d) => d.isPaid);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       <Link
         to="/debts"
         className="text-sm text-blue-600 hover:underline mb-4 inline-block"
@@ -77,6 +127,11 @@ export default function DebtorDetailPage() {
               {unpaidDebts.length} unpaid item(s)
             </p>
           </div>
+          {actionError && (
+            <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-6">
+              Error: {actionError}
+            </div>
+          )}
           {unpaidDebts.length > 0 && (
             <button
               onClick={handlePayAll}
@@ -94,7 +149,13 @@ export default function DebtorDetailPage() {
           <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide px-6 pt-6 pb-2">
             Unpaid
           </h2>
-          <DebtTable debts={unpaidDebts} />
+          <DebtTable
+            debts={unpaidDebts}
+            showActions
+            actionId={actionId}
+            onPay={handlePayOne}
+            onSplit={handleSplit}
+          />
         </div>
       )}
 
@@ -110,7 +171,19 @@ export default function DebtorDetailPage() {
   );
 }
 
-function DebtTable({ debts }: { debts: UserDebtSummary["debts"] }) {
+function DebtTable({
+  debts,
+  showActions = false,
+  actionId = null,
+  onPay,
+  onSplit,
+}: {
+  debts: UserDebtSummary["debts"];
+  showActions?: boolean;
+  actionId?: number | null;
+  onPay?: (debtId: number) => void;
+  onSplit?: (debtId: number) => void;
+}) {
   return (
     <table className="w-full text-sm">
       <thead className="text-left text-slate-500 border-b border-slate-100">
@@ -119,6 +192,7 @@ function DebtTable({ debts }: { debts: UserDebtSummary["debts"] }) {
           <th className="px-6 py-2 font-medium">Description</th>
           <th className="px-6 py-2 font-medium">Rental</th>
           <th className="px-6 py-2 font-medium">Amount</th>
+          {showActions && <th className="px-6 py-2 font-medium"></th>}
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-50">
@@ -145,6 +219,24 @@ function DebtTable({ debts }: { debts: UserDebtSummary["debts"] }) {
             <td className="px-6 py-3 font-medium text-slate-800">
               {d.amount} {d.currency}
             </td>
+            {showActions && (
+              <td className="px-6 py-3 text-right whitespace-nowrap">
+                <button
+                  onClick={() => onSplit?.(d.id)}
+                  disabled={actionId === d.id}
+                  className="text-xs font-medium text-blue-600 hover:underline disabled:opacity-50 mr-3"
+                >
+                  Split
+                </button>
+                <button
+                  onClick={() => onPay?.(d.id)}
+                  disabled={actionId === d.id}
+                  className="text-xs font-medium px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition"
+                >
+                  {actionId === d.id ? "..." : "Pay"}
+                </button>
+              </td>
+            )}
           </tr>
         ))}
       </tbody>
