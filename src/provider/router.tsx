@@ -24,6 +24,7 @@ import TariffsPage from "../pages/TariffsPage";
 import DiscountsPage from "../pages/DiscountsPage";
 import SettingsPage from "../pages/SettingsPage";
 import GeoZonesPage from "../pages/GeoZonesPage";
+import BrandsPage from "../pages/BrandsPage";
 
 export const router = createBrowserRouter([
   {
@@ -96,6 +97,7 @@ export const router = createBrowserRouter([
             path: "/geozones",
             element: <GeoZonesPage />,
           },
+          { path: "/brands", element: <BrandsPage /> },
           {
             path: "/cars/:id",
             element: <CarDetailPage />,
