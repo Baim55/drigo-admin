@@ -105,6 +105,12 @@ export default function AdminLayout() {
           >
             Geozones
           </Link>
+          <Link
+            to="/accidents"
+            className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition"
+          >
+            Accidents
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">

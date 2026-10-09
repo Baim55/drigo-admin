@@ -25,6 +25,7 @@ import DiscountsPage from "../pages/DiscountsPage";
 import SettingsPage from "../pages/SettingsPage";
 import GeoZonesPage from "../pages/GeoZonesPage";
 import BrandsPage from "../pages/BrandsPage";
+import AccidentsPage from "../pages/AccidentsPage";
 
 export const router = createBrowserRouter([
   {
@@ -98,6 +99,7 @@ export const router = createBrowserRouter([
             element: <GeoZonesPage />,
           },
           { path: "/brands", element: <BrandsPage /> },
+          { path: "/accidents", element: <AccidentsPage /> },
           {
             path: "/cars/:id",
             element: <CarDetailPage />,
