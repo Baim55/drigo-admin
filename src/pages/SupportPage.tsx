@@ -7,6 +7,7 @@ import {
   HiOutlineExclamationCircle,
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
+  HiOutlineUser,
 } from "react-icons/hi2";
 
 const STATUS_OPTIONS: { value: SupportStatus | ""; label: string }[] = [
@@ -110,14 +111,14 @@ export default function SupportPage() {
               <Link
                 key={t.id}
                 to={`/support/${t.id}`}
-                className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/60 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 hover:bg-slate-50/60 transition-colors gap-3"
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   {t.hasUnread && (
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0 shadow-xs" />
                   )}
                   <div className="min-w-0">
-                    <p className="font-bold text-slate-900 truncate flex items-center gap-2">
+                    <p className="font-bold text-slate-900 truncate flex items-center gap-2 flex-wrap">
                       <span>{t.memberName}</span>
                       <span className="text-slate-400 font-normal text-xs bg-slate-100 px-2.5 py-0.5 rounded-md">
                         {t.reasonName}
@@ -128,18 +129,26 @@ export default function SupportPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+
+                <div className="flex items-center gap-4 flex-shrink-0 justify-between sm:justify-end">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
+                    <HiOutlineUser size={14} className="text-slate-400" />
+                    <span>{t.operatorName ?? "Unassigned"}</span>
+                  </div>
+
                   {t.unreadCount > 0 && (
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600 ring-1 ring-red-200">
                       {t.unreadCount} unread
                     </span>
                   )}
+
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[t.status]}`}
                   >
                     {t.status}
                   </span>
-                  <span className="text-xs font-medium text-slate-400 w-20 text-right hidden sm:block">
+
+                  <span className="text-xs font-medium text-slate-400 w-20 text-right hidden md:block">
                     {new Date(t.lastMessageAt).toLocaleDateString()}
                   </span>
                 </div>

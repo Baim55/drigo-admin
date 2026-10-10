@@ -1,11 +1,20 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
+  assignSupport,
+  getAdmins,
   getSupportMessages,
+  getSupportTicket,
+  muteSupport,
   sendSupportMessage,
   updateSupportStatus,
+  type AdminUser,
 } from "../api/support";
-import type { SupportMessage, SupportStatus } from "../types/support";
+import type {
+  SupportMessage,
+  SupportStatus,
+  SupportTicket,
+} from "../types/support";
 import {
   HiOutlineArrowLongLeft,
   HiOutlineExclamationCircle,
@@ -28,6 +37,11 @@ export default function SupportDetailPage() {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  const [ticket, setTicket] = useState<SupportTicket | null>(null);
+  const [admins, setAdmins] = useState<AdminUser[]>([]);
+  const [opBusy, setOpBusy] = useState(false);
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,6 +52,20 @@ export default function SupportDetailPage() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  function loadTicket() {
+    if (!id) return;
+    getSupportTicket(Number(id))
+      .then(setTicket)
+      .catch(() => {});
+  }
+
+  useEffect(() => {
+    loadTicket();
+    getAdmins()
+      .then(setAdmins)
+      .catch(() => {});
+  }, [id]);
 
   function loadMessages() {
     if (!id) return;
@@ -77,6 +105,34 @@ export default function SupportDetailPage() {
     }
   }
 
+  async function handleAssign(operatorId: string) {
+    if (!id || !operatorId) return;
+    setOpBusy(true);
+    setError("");
+    try {
+      await assignSupport(Number(id), operatorId);
+      loadTicket();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setOpBusy(false);
+    }
+  }
+
+  async function handleMuteToggle() {
+    if (!id || !ticket) return;
+    setOpBusy(true);
+    setError("");
+    try {
+      await muteSupport(Number(id), !ticket.isMuted);
+      loadTicket();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setOpBusy(false);
+    }
+  }
+
   if (loading)
     return (
       <div className="py-12 text-center text-slate-500 font-medium">
@@ -94,6 +150,30 @@ export default function SupportDetailPage() {
           <HiOutlineArrowLongLeft size={20} />
           <span>Back to support</span>
         </Link>
+        <div className="flex items-center gap-2">
+          <select
+            value={ticket?.operatorId ?? ""}
+            onChange={(e) => handleAssign(e.target.value)}
+            disabled={opBusy}
+            className="text-sm rounded-md border border-slate-300 px-3 py-1.5 bg-white"
+          >
+            <option value="" disabled>
+              Assign to...
+            </option>
+            {admins.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.fullName}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleMuteToggle}
+            disabled={opBusy || !ticket}
+            className="text-sm rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50 disabled:opacity-50"
+          >
+            {ticket?.isMuted ? "Unmute" : "Mute"}
+          </button>
+        </div>
         <select
           onChange={(e) => handleStatusChange(e.target.value as SupportStatus)}
           disabled={updatingStatus}

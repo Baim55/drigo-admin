@@ -54,3 +54,25 @@ export function muteSupport(id: number, isMuted: boolean) {
     body: JSON.stringify({ isMuted }),
   });
 }
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  fullName: string;
+  isSuperAdmin: boolean;
+}
+
+export function getAdmins() {
+  return apiClient<{ data: AdminUser[] }>("/api/admin/auth").then((res) => res.data);
+}
+
+export function assignSupport(id: number, operatorId: string) {
+  return apiClient<unknown>(`/api/admin/supports/${id}/assign`, {
+    method: "PUT",
+    body: JSON.stringify({ operatorId }),
+  });
+}
+
+export function getSupportTicket(id: number) {
+  return apiClient<SupportTicket>(`/api/admin/supports/${id}`);
+}
