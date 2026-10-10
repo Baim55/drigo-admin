@@ -11,6 +11,7 @@ import {
   HiOutlineExclamationCircle,
   HiOutlinePaperAirplane,
 } from "react-icons/hi2";
+import SupportContextPanel from "../components/SupportContextPanel";
 
 const STATUS_OPTIONS: SupportStatus[] = [
   "Open",
@@ -84,7 +85,7 @@ export default function SupportDetailPage() {
     );
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between gap-4">
         <Link
           to="/support"
@@ -117,68 +118,72 @@ export default function SupportDetailPage() {
         </div>
       )}
 
-      {/* Chat Container */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[550px] overflow-hidden">
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-slate-50/50">
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={`flex ${m.isOperator ? "justify-end" : "justify-start"}`}
-            >
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[600px] overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-slate-50/50">
+            {messages.map((m) => (
               <div
-                className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-xs ${
-                  m.isOperator
-                    ? "bg-blue-600 text-white rounded-br-xs"
-                    : "bg-white text-slate-800 rounded-bl-xs border border-slate-200"
-                }`}
+                key={m.id}
+                className={`flex ${m.isOperator ? "justify-end" : "justify-start"}`}
               >
-                <p
-                  className={`text-xs font-bold mb-1 opacity-80 ${m.isOperator ? "text-blue-100" : "text-slate-500"}`}
+                <div
+                  className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-xs ${
+                    m.isOperator
+                      ? "bg-blue-600 text-white rounded-br-xs"
+                      : "bg-white text-slate-800 rounded-bl-xs border border-slate-200"
+                  }`}
                 >
-                  {m.createdBy}
-                </p>
-                <p className="leading-relaxed">{m.message}</p>
-                {m.mediaUrl && (
-                  <img
-                    src={m.mediaUrl}
-                    alt="attachment"
-                    className="mt-2.5 rounded-xl max-w-full border border-black/10"
-                  />
-                )}
-                <p
-                  className={`text-[10px] opacity-70 mt-1.5 text-right font-medium ${m.isOperator ? "text-blue-100" : "text-slate-400"}`}
-                >
-                  {new Date(m.createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
+                  <p
+                    className={`text-xs font-bold mb-1 opacity-80 ${m.isOperator ? "text-blue-100" : "text-slate-500"}`}
+                  >
+                    {m.createdBy}
+                  </p>
+                  <p className="leading-relaxed">{m.message}</p>
+                  {m.mediaUrl && (
+                    <img
+                      src={m.mediaUrl}
+                      alt="attachment"
+                      className="mt-2.5 rounded-xl max-w-full border border-black/10"
+                    />
+                  )}
+                  <p
+                    className={`text-[10px] opacity-70 mt-1.5 text-right font-medium ${m.isOperator ? "text-blue-100" : "text-slate-400"}`}
+                  >
+                    {new Date(m.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-          <div ref={bottomRef} />
+            ))}
+            <div ref={bottomRef} />
+          </div>
+
+          <form
+            onSubmit={handleSend}
+            className="bg-white border-t border-slate-200 p-4 flex gap-3 items-center"
+          >
+            <input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a reply..."
+              className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            />
+            <button
+              type="submit"
+              disabled={sending || !newMessage.trim()}
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-sm"
+            >
+              <span>{sending ? "Sending..." : "Send"}</span>
+              <HiOutlinePaperAirplane size={16} />
+            </button>
+          </form>
         </div>
 
-        {/* Input Form */}
-        <form
-          onSubmit={handleSend}
-          className="bg-white border-t border-slate-200 p-4 flex gap-3 items-center"
-        >
-          <input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a reply..."
-            className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          />
-          <button
-            type="submit"
-            disabled={sending || !newMessage.trim()}
-            className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-sm"
-          >
-            <span>{sending ? "Sending..." : "Send"}</span>
-            <HiOutlinePaperAirplane size={16} />
-          </button>
-        </form>
+        <div className="lg:col-span-1">
+          <SupportContextPanel ticketId={Number(id)} />
+        </div>
       </div>
     </div>
   );

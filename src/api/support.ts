@@ -3,6 +3,7 @@ import type {
   SupportTicket,
   SupportStatus,
   SupportMessage,
+  SupportContext,
 } from "../types/support";
 import { apiClient } from "./client";
 
@@ -40,5 +41,16 @@ export function updateSupportStatus(id: number, status: SupportStatus) {
   return apiClient<SupportTicket>(`/api/admin/supports/${id}/status`, {
     method: "PUT",
     body: JSON.stringify({ status }),
+  });
+}
+
+export function getSupportContext(id: number) {
+  return apiClient<SupportContext>(`/api/admin/supports/${id}/context`);
+}
+
+export function muteSupport(id: number, isMuted: boolean) {
+  return apiClient<unknown>(`/api/admin/supports/${id}/mute`, {
+    method: "PUT",
+    body: JSON.stringify({ isMuted }),
   });
 }
