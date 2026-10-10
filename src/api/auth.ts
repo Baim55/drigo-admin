@@ -1,4 +1,9 @@
-import type { AdminUser, LoginRequest, VerifyRequest } from "../types/auth";
+import type {
+  AdminUser,
+  LoginRequest,
+  MyPermissions,
+  VerifyRequest,
+} from "../types/auth";
 import { apiClient } from "./client";
 
 export function login(data: LoginRequest) {
@@ -15,8 +20,8 @@ export function verifyOtp(data: VerifyRequest) {
   });
 }
 
-export function getMe(){
-    return apiClient<AdminUser>("/api/admin/auth/me")
+export function getMe() {
+  return apiClient<AdminUser>("/api/admin/auth/me");
 }
 
 export function logout() {
@@ -26,5 +31,5 @@ export function logout() {
 }
 
 export function getMyPermissions() {
-  return apiClient<string[]>("/api/admin/permissions/my-permissions");
+  return apiClient<MyPermissions>("/api/admin/permissions/my-permissions");
 }

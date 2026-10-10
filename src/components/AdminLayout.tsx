@@ -1,5 +1,5 @@
-import { Outlet, useNavigate, Link, NavLink } from "react-router-dom";
-import { logout, getMyPermissions } from "../api/auth";
+import { Outlet, useNavigate, NavLink } from "react-router-dom";
+import { logout, getMyPermissions, getMe } from "../api/auth";
 import { useState, useEffect } from "react";
 import {
   HiOutlineChartPie,
@@ -21,44 +21,118 @@ import {
   HiOutlineBars3,
   HiOutlineXMark,
 } from "react-icons/hi2";
+import type { AdminUser } from "../types/auth";
 
 const NAV_LINKS = [
-  { to: "/dashboard", label: "Dashboard", icon: HiOutlineChartPie, permission: "dashboard.view" },
-  { to: "/cars", label: "Cars", icon: HiOutlineTruck, permission: "cars.view" },
-  { to: "/rentals", label: "Rentals", icon: HiOutlineDocumentText, permission: "rentals.view" },
-  { to: "/customers", label: "Customers", icon: HiOutlineUsers, permission: "customers.view" },
-  { to: "/debts", label: "Debts", icon: HiOutlineCreditCard, permission: "debts.view" },
-  { to: "/fines", label: "Fines", icon: HiOutlineExclamationTriangle, permission: "fines.view" },
-  { to: "/accidents", label: "Accidents", icon: HiOutlineShieldExclamation, permission: "support.view" }, // fallback və ya uyğun permission
-  { to: "/reservations", label: "Reservations", icon: HiOutlineCalendarDays, permission: "reservations.view" },
-  { to: "/support", label: "Support", icon: HiOutlineChatBubbleBottomCenterText, permission: "support.view" },
-  { to: "/analytics", label: "Analytics", icon: HiOutlineChartBarSquare, permission: "analytics.view" },
-  { to: "/tariffs", label: "Tariffs", icon: HiOutlineDocumentDuplicate, permission: "tariffs.view" },
-  { to: "/discounts", label: "Discounts", icon: HiOutlineTag, permission: "promotions.view" }, // promotions / discounts
-  { to: "/brands", label: "Brands", icon: HiOutlineBuildingStorefront, permission: "cars.view" }, // brands üçün cars və ya settings verə bilərsiniz
-  { to: "/settings", label: "Settings", icon: HiOutlineCog6Tooth, permission: "settings.view" },
-  { to: "/geozones", label: "Geo Zones", icon: HiOutlineMap, permission: "fleet.view" },
+  {
+    to: "/dashboard",
+    label: "Dashboard",
+    icon: HiOutlineChartPie,
+    permission: "dashboard.view",
+  },
+  {
+    to: "/cars",
+    label: "Cars",
+    icon: HiOutlineTruck,
+    permission: "cars.view",
+  },
+  {
+    to: "/rentals",
+    label: "Rentals",
+    icon: HiOutlineDocumentText,
+    permission: "rentals.view",
+  },
+  {
+    to: "/customers",
+    label: "Customers",
+    icon: HiOutlineUsers,
+    permission: "customers.view",
+  },
+  {
+    to: "/debts",
+    label: "Debts",
+    icon: HiOutlineCreditCard,
+    permission: "debts.view",
+  },
+  {
+    to: "/fines",
+    label: "Fines",
+    icon: HiOutlineExclamationTriangle,
+    permission: "fines.view",
+  },
+  {
+    to: "/accidents",
+    label: "Accidents",
+    icon: HiOutlineShieldExclamation,
+    permission: "fines.view",
+  },
+  {
+    to: "/reservations",
+    label: "Reservations",
+    icon: HiOutlineCalendarDays,
+    permission: "reservations.view",
+  },
+  {
+    to: "/support",
+    label: "Support",
+    icon: HiOutlineChatBubbleBottomCenterText,
+    permission: "support.view",
+  },
+  {
+    to: "/analytics",
+    label: "Analytics",
+    icon: HiOutlineChartBarSquare,
+    permission: "analytics.view",
+  },
+  {
+    to: "/tariffs",
+    label: "Tariffs",
+    icon: HiOutlineDocumentDuplicate,
+    permission: "tariffs.view",
+  },
+  {
+    to: "/discounts",
+    label: "Discounts",
+    icon: HiOutlineTag,
+    permission: "promotions.view",
+  },
+  {
+    to: "/brands",
+    label: "Brands",
+    icon: HiOutlineBuildingStorefront,
+    permission: "cars.view", 
+  },
+  {
+    to: "/settings",
+    label: "Settings",
+    icon: HiOutlineCog6Tooth,
+    permission: "settings.view",
+  },
+  {
+    to: "/geozones",
+    label: "Geo Zones",
+    icon: HiOutlineMap,
+    permission: "fleet.view", 
+  },
 ];
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [permissions, setPermissions] = useState<string[] | null>(null);
+  const [isSuper, setIsSuper] = useState(false);
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
 
- useEffect(() => {
+  useEffect(() => {
+    getMe()
+      .then((user) => setCurrentUser(user))
+      .catch(() => setCurrentUser(null));
     getMyPermissions()
-      .then((res: any) => {
-        if (res && Array.isArray(res.permissionCodes)) {
-          setPermissions(res.permissionCodes);
-        } else if (Array.isArray(res)) {
-          setPermissions(res);
-        } else {
-          setPermissions([]);
-        }
+      .then((res) => {
+        setPermissions(res.permissionCodes);
+        setIsSuper(res.isSuperAdmin);
       })
-      .catch(() => {
-        setPermissions([]);
-      });
+      .catch(() => setPermissions([]));
   }, []);
 
   const handleLogout = async () => {
@@ -71,7 +145,8 @@ export default function AdminLayout() {
   };
 
   const filteredLinks = NAV_LINKS.filter((link) => {
-    if (!permissions || permissions.length === 0) return true;
+    if (permissions === null) return false;
+    if (isSuper) return true;
     return permissions.includes(link.permission);
   });
 
@@ -165,25 +240,28 @@ export default function AdminLayout() {
               Management Portal
             </h2>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
-              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs">
-                AD
-              </div>
-              <div className="hidden sm:block text-left">
-                <span className="text-xs font-bold text-slate-800 block">
-                  Administrator
-                </span>
-                <span className="text-[10px] text-slate-500 block">
-                  Super Admin
-                </span>
-              </div>
+          <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
+            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-xs">
+              {currentUser?.username
+                ? currentUser.username.slice(0, 2).toUpperCase()
+                : "AD"}
+            </div>
+            <div className="hidden sm:block text-left">
+              <span className="text-[10px] text-slate-500 block">
+                {currentUser?.isSuperAdmin
+                  ? "Super Admin"
+                  : currentUser?.username === "fleet"
+                    ? "Fleet Manager"
+                    : currentUser?.username === "operator"
+                      ? "Support Operator"
+                      : (currentUser?.role ?? "Operator / Manager")}
+              </span>
             </div>
           </div>
         </header>
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 bg-slate-50/50">
           <div className="max-w-7xl mx-auto">
-            <Outlet />
+            <Outlet context={{ permissions, isSuper }}/>
           </div>
         </main>
       </div>
