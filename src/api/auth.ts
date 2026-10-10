@@ -24,3 +24,7 @@ export function logout() {
     method: "POST",
   });
 }
+
+export function getMyPermissions() {
+  return apiClient<string[]>("/api/admin/permissions/my-permissions");
+}

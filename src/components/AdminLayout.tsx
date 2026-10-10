@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, Link, NavLink } from "react-router-dom";
-import { logout } from "../api/auth";
-import { useState } from "react";
+import { logout, getMyPermissions } from "../api/auth";
+import { useState, useEffect } from "react";
 import {
   HiOutlineChartPie,
   HiOutlineTruck,
@@ -23,30 +23,43 @@ import {
 } from "react-icons/hi2";
 
 const NAV_LINKS = [
-  { to: "/dashboard", label: "Dashboard", icon: HiOutlineChartPie },
-  { to: "/cars", label: "Cars", icon: HiOutlineTruck },
-  { to: "/rentals", label: "Rentals", icon: HiOutlineDocumentText },
-  { to: "/customers", label: "Customers", icon: HiOutlineUsers },
-  { to: "/debts", label: "Debts", icon: HiOutlineCreditCard },
-  { to: "/fines", label: "Fines", icon: HiOutlineExclamationTriangle },
-  { to: "/accidents", label: "Accidents", icon: HiOutlineShieldExclamation },
-  { to: "/reservations", label: "Reservations", icon: HiOutlineCalendarDays },
-  {
-    to: "/support",
-    label: "Support",
-    icon: HiOutlineChatBubbleBottomCenterText,
-  },
-  { to: "/analytics", label: "Analytics", icon: HiOutlineChartBarSquare },
-  { to: "/tariffs", label: "Tariffs", icon: HiOutlineDocumentDuplicate },
-  { to: "/discounts", label: "Discounts", icon: HiOutlineTag },
-  { to: "/brands", label: "Brands", icon: HiOutlineBuildingStorefront },
-  { to: "/settings", label: "Settings", icon: HiOutlineCog6Tooth },
-  { to: "/geozones", label: "Geo Zones", icon: HiOutlineMap },
+  { to: "/dashboard", label: "Dashboard", icon: HiOutlineChartPie, permission: "dashboard.view" },
+  { to: "/cars", label: "Cars", icon: HiOutlineTruck, permission: "cars.view" },
+  { to: "/rentals", label: "Rentals", icon: HiOutlineDocumentText, permission: "rentals.view" },
+  { to: "/customers", label: "Customers", icon: HiOutlineUsers, permission: "customers.view" },
+  { to: "/debts", label: "Debts", icon: HiOutlineCreditCard, permission: "debts.view" },
+  { to: "/fines", label: "Fines", icon: HiOutlineExclamationTriangle, permission: "fines.view" },
+  { to: "/accidents", label: "Accidents", icon: HiOutlineShieldExclamation, permission: "support.view" }, // fallback və ya uyğun permission
+  { to: "/reservations", label: "Reservations", icon: HiOutlineCalendarDays, permission: "reservations.view" },
+  { to: "/support", label: "Support", icon: HiOutlineChatBubbleBottomCenterText, permission: "support.view" },
+  { to: "/analytics", label: "Analytics", icon: HiOutlineChartBarSquare, permission: "analytics.view" },
+  { to: "/tariffs", label: "Tariffs", icon: HiOutlineDocumentDuplicate, permission: "tariffs.view" },
+  { to: "/discounts", label: "Discounts", icon: HiOutlineTag, permission: "promotions.view" }, // promotions / discounts
+  { to: "/brands", label: "Brands", icon: HiOutlineBuildingStorefront, permission: "cars.view" }, // brands üçün cars və ya settings verə bilərsiniz
+  { to: "/settings", label: "Settings", icon: HiOutlineCog6Tooth, permission: "settings.view" },
+  { to: "/geozones", label: "Geo Zones", icon: HiOutlineMap, permission: "fleet.view" },
 ];
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [permissions, setPermissions] = useState<string[] | null>(null);
+
+ useEffect(() => {
+    getMyPermissions()
+      .then((res: any) => {
+        if (res && Array.isArray(res.permissionCodes)) {
+          setPermissions(res.permissionCodes);
+        } else if (Array.isArray(res)) {
+          setPermissions(res);
+        } else {
+          setPermissions([]);
+        }
+      })
+      .catch(() => {
+        setPermissions([]);
+      });
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -56,6 +69,11 @@ export default function AdminLayout() {
       console.error("Logout failed:", err);
     }
   };
+
+  const filteredLinks = NAV_LINKS.filter((link) => {
+    if (!permissions || permissions.length === 0) return true;
+    return permissions.includes(link.permission);
+  });
 
   return (
     <div className="flex h-screen bg-slate-100 overflow-hidden font-sans">
@@ -93,7 +111,7 @@ export default function AdminLayout() {
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
-          {NAV_LINKS.map((link) => {
+          {filteredLinks.map((link) => {
             const Icon = link.icon;
             return (
               <NavLink
