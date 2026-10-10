@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getCarsTracking } from "../api/cars";
 import type { CarTrackingItem } from "../types/car";
+import { HiOutlineMap, HiOutlineExclamationCircle } from "react-icons/hi2";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -51,41 +52,49 @@ export default function CarsTrackingPage() {
     );
   }
 
-  const center: [number, number] = [25.2048, 55.2708]; 
+  const center: [number, number] = [25.2048, 55.2708];
   const onlineCount = cars.filter((c) => c.online).length;
   const availableCount = cars.filter((c) => c.status === "Available").length;
   const rentedCount = cars.filter((c) => c.activeRentalId !== null).length;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-1">Live Tracking</h1>
-      <p className="text-sm text-slate-500 mb-4">
-        {cars.length} cars on the map
-      </p>
-
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-4">
-          <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
-            Online
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <HiOutlineMap className="text-blue-600" size={28} />
+            <span>Live Fleet Tracking</span>
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Real-time GPS tracking and telemetry for {cars.length} active fleet
+            vehicles.
           </p>
-          <p className="text-2xl font-bold text-green-600">{onlineCount}</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-4">
-          <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
-            Available
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Online Vehicles
+          </p>
+          <p className="text-2xl font-bold text-emerald-600">{onlineCount}</p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Available Vehicles
           </p>
           <p className="text-2xl font-bold text-blue-600">{availableCount}</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-4">
-          <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
-            Rented
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Rented Vehicles
           </p>
           <p className="text-2xl font-bold text-slate-800">{rentedCount}</p>
         </div>
       </div>
 
       <div
-        className="rounded-2xl overflow-hidden shadow-sm ring-1 ring-slate-200"
+        className="rounded-2xl overflow-hidden shadow-sm border border-slate-200"
         style={{ height: "600px" }}
       >
         <MapContainer
@@ -104,7 +113,7 @@ export default function CarsTrackingPage() {
               car.activeRentalId !== null
                 ? "#ef4444"
                 : car.online
-                  ? "#3b82f6"
+                  ? "#2563eb"
                   : "#94a3b8";
 
             return (
@@ -114,29 +123,33 @@ export default function CarsTrackingPage() {
                 icon={createColoredIcon(markerColor)}
               >
                 <Popup>
-                  <div className="text-sm min-w-[160px]">
-                    <p className="font-semibold text-slate-800">
+                  <div className="text-sm min-w-[160px] p-1">
+                    <p className="font-bold text-slate-900">
                       {car.brandName} {car.modelName}
                     </p>
-                    <p className="text-slate-500 text-xs mb-2">
+                    <p className="text-slate-500 text-xs mb-2 font-mono">
                       {car.plateNumber}
                     </p>
-                    <div className="space-y-1">
+                    <div className="space-y-1 text-xs">
                       <p>
                         <span className="text-slate-500">Status:</span>{" "}
-                        <span className="font-medium">{car.status}</span>
+                        <span className="font-semibold text-slate-800">
+                          {car.status}
+                        </span>
                       </p>
                       <p>
                         <span className="text-slate-500">Fuel:</span>{" "}
-                        <span className="font-medium">
+                        <span className="font-semibold text-slate-800">
                           {car.fuelLevel.toFixed(0)}%
                         </span>
                       </p>
-                      <p className="flex items-center gap-1">
+                      <p className="flex items-center gap-1.5 pt-1">
                         <span
-                          className={`inline-block w-2 h-2 rounded-full ${car.online ? "bg-green-500" : "bg-slate-300"}`}
+                          className={`inline-block w-2 h-2 rounded-full ${car.online ? "bg-emerald-500" : "bg-slate-300"}`}
                         />
-                        {car.online ? "Online" : "Offline"}
+                        <span className="font-medium">
+                          {car.online ? "Online" : "Offline"}
+                        </span>
                       </p>
                     </div>
                   </div>

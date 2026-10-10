@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getReservations } from "../api/reservations";
 import type { Reservation, ReservationStatus } from "../types/reservation";
+import {
+  HiOutlineCalendarDays,
+  HiOutlineExclamationCircle,
+  HiOutlineChevronLeft,
+  HiOutlineChevronRight,
+} from "react-icons/hi2";
 
 const STATUS_OPTIONS: { value: ReservationStatus | ""; label: string }[] = [
   { value: "", label: "All" },
@@ -60,21 +66,30 @@ export default function ReservationsPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Reservations</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <HiOutlineCalendarDays className="text-blue-600" size={28} />
+          <span>Reservations & Delivery</span>
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Track car reservation pipelines, delivery addresses, and assigned
+          drivers.
+        </p>
+      </div>
 
-      <div className="flex flex-wrap gap-1 mb-4">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
         {STATUS_OPTIONS.map((opt) => (
           <button
-            key={opt.value}
+            key={opt.value || "all"}
             onClick={() => {
               setStatus(opt.value);
               setPage(1);
             }}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
               status === opt.value
-                ? "bg-slate-800 text-white"
-                : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
             }`}
           >
             {opt.label}
@@ -82,40 +97,47 @@ export default function ReservationsPage() {
         ))}
       </div>
 
-      {loading && <p className="text-slate-500">Loading...</p>}
+      {loading && (
+        <div className="py-12 text-center text-slate-500 font-medium">
+          Loading reservations...
+        </div>
+      )}
 
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Error: {error}
+        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+          <HiOutlineExclamationCircle size={20} className="shrink-0" />
+          <span>Error: {error}</span>
         </div>
       )}
 
       {!loading && !error && reservations.length === 0 && (
-        <p className="text-slate-500">No reservations found.</p>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 font-medium">
+          No reservations found.
+        </div>
       )}
 
       {!loading && !error && reservations.length > 0 && (
-        <>
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-600 text-left border-b border-slate-200">
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full text-sm text-left min-w-[750px]">
+                <thead className="bg-slate-50/70 text-slate-500 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Customer</th>
-                    <th className="px-4 py-3 font-medium">Car</th>
-                    <th className="px-4 py-3 font-medium">Delivery</th>
-                    <th className="px-4 py-3 font-medium">Price</th>
-                    <th className="px-4 py-3 font-medium">Driver</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-6 py-3.5">Customer</th>
+                    <th className="px-6 py-3.5">Car</th>
+                    <th className="px-6 py-3.5">Delivery Address</th>
+                    <th className="px-6 py-3.5">Price</th>
+                    <th className="px-6 py-3.5">Driver</th>
+                    <th className="px-6 py-3.5">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {reservations.map((r) => (
                     <tr
                       key={r.id}
-                      className="hover:bg-slate-50/70 transition-colors"
+                      className="hover:bg-slate-50/60 transition-colors"
                     >
-                      <td className="px-5 py-4 font-semibold text-slate-800">
+                      <td className="px-6 py-4 font-bold text-slate-900">
                         <Link
                           to={`/reservations/${r.id}`}
                           className="hover:text-blue-600 hover:underline"
@@ -123,21 +145,24 @@ export default function ReservationsPage() {
                           {r.customerName}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {r.carName} · {r.plateNumber}
+                      <td className="px-6 py-4 text-slate-600 font-medium">
+                        {r.carName} ·{" "}
+                        <span className="font-mono text-xs">
+                          {r.plateNumber}
+                        </span>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-6 py-4 text-slate-600 max-w-xs truncate">
                         {formatAddress(r.deliveryAddress)}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-800">
+                      <td className="px-6 py-4 font-bold text-slate-900">
                         {r.totalPrice} AED
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-6 py-4 text-slate-600 font-medium">
                         {r.driverName ?? "-"}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-6 py-4">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[r.status]}`}
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[r.status]}`}
                         >
                           {r.status}
                         </span>
@@ -149,28 +174,33 @@ export default function ReservationsPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-slate-500">
-              Total {total} reservations, page {page}/{totalPages}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-1">
+            <p className="text-xs font-medium text-slate-500">
+              Total <span className="font-bold text-slate-700">{total}</span>{" "}
+              reservations, page{" "}
+              <span className="font-bold text-slate-700">{page}</span>/
+              <span className="font-bold text-slate-700">{totalPages}</span>
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition bg-white"
               >
-                Previous
+                <HiOutlineChevronLeft size={16} />
+                <span>Previous</span>
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition bg-white"
               >
-                Next
+                <span>Next</span>
+                <HiOutlineChevronRight size={16} />
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

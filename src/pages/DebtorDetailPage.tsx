@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getUserDebts, payAllDebts, payDebt, splitDebt } from "../api/debts";
 import type { UserDebtSummary } from "../types/debt";
+import {
+  HiOutlineArrowLongLeft,
+  HiOutlineExclamationCircle,
+  HiOutlineCreditCard,
+  HiOutlineCheckCircle,
+} from "react-icons/hi2";
 
 export default function DebtorDetailPage() {
   const { id } = useParams();
@@ -93,12 +99,18 @@ export default function DebtorDetailPage() {
     }
   }
 
-  if (loading) return <p className="text-slate-500">Loading...</p>;
+  if (loading)
+    return (
+      <div className="py-12 text-center text-slate-500 font-medium">
+        Loading debtor details...
+      </div>
+    );
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-        Error: {error}
+      <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+        <HiOutlineExclamationCircle size={20} className="shrink-0" />
+        <span>Error: {error}</span>
       </div>
     );
   }
@@ -109,62 +121,73 @@ export default function DebtorDetailPage() {
   const paidDebts = summary.debts.filter((d) => d.isPaid);
 
   return (
-    <div className="max-w-8xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto">
       <Link
         to="/debts"
-        className="text-sm text-blue-600 hover:underline mb-4 inline-block"
+        className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1.5"
       >
-        ← Back to debtors
+        <HiOutlineArrowLongLeft size={20} />
+        <span>Back to debtors</span>
       </Link>
 
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
-        <div className="flex items-center justify-between">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
-              Total debt: {summary.totalDebt} {summary.currency}
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <HiOutlineCreditCard className="text-red-500" size={26} />
+              <span>
+                Total Debt: {summary.totalDebt} {summary.currency}
+              </span>
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              {unpaidDebts.length} unpaid item(s)
+            <p className="text-sm font-medium text-slate-500 mt-1">
+              {unpaidDebts.length} unpaid item(s) pending collection.
             </p>
           </div>
-          {actionError && (
-            <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-6">
-              Error: {actionError}
-            </div>
-          )}
           {unpaidDebts.length > 0 && (
             <button
               onClick={handlePayAll}
               disabled={paying}
-              className="text-sm font-medium px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition"
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-sm"
             >
-              {paying ? "Processing..." : "Pay all"}
+              <HiOutlineCheckCircle size={18} />
+              <span>{paying ? "Processing..." : "Pay All Debts"}</span>
             </button>
           )}
         </div>
+
+        {actionError && (
+          <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 mt-4 flex items-center gap-3">
+            <HiOutlineExclamationCircle size={20} className="shrink-0" />
+            <span>Error: {actionError}</span>
+          </div>
+        )}
       </div>
 
       {unpaidDebts.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 overflow-hidden mb-6">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide px-6 pt-6 pb-2">
-            Unpaid
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-6 pt-6 pb-3">
+            Unpaid Debts ({unpaidDebts.length})
           </h2>
-          <DebtTable
-            debts={unpaidDebts}
-            showActions
-            actionId={actionId}
-            onPay={handlePayOne}
-            onSplit={handleSplit}
-          />
+          <div className="overflow-x-auto custom-scrollbar">
+            <DebtTable
+              debts={unpaidDebts}
+              showActions
+              actionId={actionId}
+              onPay={handlePayOne}
+              onSplit={handleSplit}
+            />
+          </div>
         </div>
       )}
 
       {paidDebts.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 overflow-hidden">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide px-6 pt-6 pb-2">
-            Paid
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-6 pt-6 pb-3">
+            Paid History ({paidDebts.length})
           </h2>
-          <DebtTable debts={paidDebts} />
+          <div className="overflow-x-auto custom-scrollbar">
+            <DebtTable debts={paidDebts} />
+          </div>
         </div>
       )}
     </div>
@@ -185,30 +208,32 @@ function DebtTable({
   onSplit?: (debtId: number) => void;
 }) {
   return (
-    <table className="w-full text-sm">
-      <thead className="text-left text-slate-500 border-b border-slate-100">
+    <table className="w-full text-sm text-left min-w-[600px]">
+      <thead className="bg-slate-50/70 text-slate-500 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
         <tr>
-          <th className="px-6 py-2 font-medium">Type</th>
-          <th className="px-6 py-2 font-medium">Description</th>
-          <th className="px-6 py-2 font-medium">Rental</th>
-          <th className="px-6 py-2 font-medium">Amount</th>
-          {showActions && <th className="px-6 py-2 font-medium"></th>}
+          <th className="px-6 py-3.5">Type</th>
+          <th className="px-6 py-3.5">Description</th>
+          <th className="px-6 py-3.5">Rental</th>
+          <th className="px-6 py-3.5">Amount</th>
+          {showActions && <th className="px-6 py-3.5 text-right">Actions</th>}
         </tr>
       </thead>
-      <tbody className="divide-y divide-slate-50">
+      <tbody className="divide-y divide-slate-100">
         {debts.map((d) => (
-          <tr key={d.id}>
-            <td className="px-6 py-3">
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+          <tr key={d.id} className="hover:bg-slate-50/60 transition-colors">
+            <td className="px-6 py-4">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
                 {d.type}
               </span>
             </td>
-            <td className="px-6 py-3 text-slate-600">{d.description ?? "-"}</td>
-            <td className="px-6 py-3">
+            <td className="px-6 py-4 text-slate-600 font-medium">
+              {d.description ?? "-"}
+            </td>
+            <td className="px-6 py-4">
               {d.rentalId ? (
                 <Link
                   to={`/rentals/${d.rentalId}`}
-                  className="text-blue-600 hover:underline"
+                  className="text-blue-600 font-semibold hover:underline"
                 >
                   #{d.rentalId}
                 </Link>
@@ -216,22 +241,22 @@ function DebtTable({
                 "-"
               )}
             </td>
-            <td className="px-6 py-3 font-medium text-slate-800">
+            <td className="px-6 py-4 font-bold text-slate-900">
               {d.amount} {d.currency}
             </td>
             {showActions && (
-              <td className="px-6 py-3 text-right whitespace-nowrap">
+              <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
                 <button
                   onClick={() => onSplit?.(d.id)}
                   disabled={actionId === d.id}
-                  className="text-xs font-medium text-blue-600 hover:underline disabled:opacity-50 mr-3"
+                  className="text-xs font-semibold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-xl transition disabled:opacity-50"
                 >
                   Split
                 </button>
                 <button
                   onClick={() => onPay?.(d.id)}
                   disabled={actionId === d.id}
-                  className="text-xs font-medium px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition"
+                  className="text-xs font-semibold px-4 py-1.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-xs"
                 >
                   {actionId === d.id ? "..." : "Pay"}
                 </button>

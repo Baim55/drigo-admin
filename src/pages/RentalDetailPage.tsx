@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getRentalById, endRental, compKm } from "../api/rentals";
 import type { RentalDetail } from "../types/rental";
+import {
+  HiOutlineArrowLongLeft,
+  HiOutlineExclamationCircle,
+  HiOutlineDocumentText,
+  HiOutlineTruck,
+  HiOutlineCreditCard,
+  HiOutlineClock,
+} from "react-icons/hi2";
 
 const STATUS_STYLES: Record<string, string> = {
   Active: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
@@ -78,12 +86,18 @@ export default function RentalDetailPage() {
     }
   }
 
-  if (loading) return <p className="text-slate-500">Loading...</p>;
+  if (loading)
+    return (
+      <div className="py-12 text-center text-slate-500 font-medium">
+        Loading rental details...
+      </div>
+    );
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-        Error: {error}
+      <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+        <HiOutlineExclamationCircle size={20} className="shrink-0" />
+        <span>Error: {error}</span>
       </div>
     );
   }
@@ -93,27 +107,29 @@ export default function RentalDetailPage() {
   const canEnd = rental.status === "Active" || rental.status === "Started";
 
   return (
-    <div className="max-w-8xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto">
       <Link
         to="/rentals"
-        className="text-sm text-blue-600 hover:underline mb-4 inline-block"
+        className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1.5"
       >
-        ← Back to rentals
+        <HiOutlineArrowLongLeft size={20} />
+        <span>Back to rentals</span>
       </Link>
 
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
-              Rental #{rental.id}
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <HiOutlineDocumentText className="text-blue-600" size={26} />
+              <span>Rental #{rental.id}</span>
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm font-medium text-slate-500 mt-1">
               {rental.user.fullName} · {rental.user.phoneNumber}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <span
-              className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold ${
                 STATUS_STYLES[rental.status] ??
                 "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
               }`}
@@ -124,7 +140,7 @@ export default function RentalDetailPage() {
               <button
                 onClick={handleEndRental}
                 disabled={ending}
-                className="text-sm font-medium px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition"
+                className="text-xs font-semibold px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition shadow-sm"
               >
                 {ending ? "Ending..." : "End rental"}
               </button>
@@ -133,23 +149,24 @@ export default function RentalDetailPage() {
         </div>
 
         {rental.problemNote && (
-          <div className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-700 mb-2">
-            Note: {rental.problemNote}
+          <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-700 mt-4">
+            <span className="font-bold">Note:</span> {rental.problemNote}
           </div>
         )}
         {rental.cancelReason && (
-          <div className="rounded-md bg-slate-50 border border-slate-200 px-3 py-2 text-sm text-slate-600">
-            Cancelled: {rental.cancelReason}
+          <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-600 mt-4">
+            <span className="font-bold">Cancelled:</span> {rental.cancelReason}
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-            Trip
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <HiOutlineTruck size={18} className="text-blue-600" />
+            <span>Trip information</span>
           </h2>
-          <dl className="space-y-2 text-sm">
+          <dl className="space-y-2.5 text-sm">
             <Row
               label="Started"
               value={new Date(rental.startDate).toLocaleString()}
@@ -170,52 +187,20 @@ export default function RentalDetailPage() {
             <Row label="Insurance" value={rental.insurance?.name ?? "None"} />
           </dl>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-            Distance compensation
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <HiOutlineCreditCard size={18} className="text-blue-600" />
+            <span>Payment summary</span>
           </h2>
-          <p className="text-sm text-slate-500 mb-3">
-            Compensation given so far:{" "}
-            <span className="font-medium text-slate-800">
-              {rental.compensationDistanceTotal ?? 0} km
-            </span>
-          </p>
-          {compError && (
-            <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600 mb-3">
-              Error: {compError}
-            </div>
-          )}
-          <form onSubmit={handleCompKm} className="flex gap-2">
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={compInput}
-              onChange={(e) => setCompInput(e.target.value)}
-              placeholder="Extra km to give"
-              className="w-48 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              disabled={compSaving || !compInput}
-              className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md disabled:opacity-50 transition"
-            >
-              {compSaving ? "Saving..." : "Add compensation"}
-            </button>
-          </form>
-        </div>
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-            Payment
-          </h2>
-          <dl className="space-y-2 text-sm">
+          <dl className="space-y-2.5 text-sm">
             <Row label="Total price" value={`${rental.totalPrice} AED`} />
             <Row label="Discount" value={`${rental.discountAmount} AED`} />
             <Row
               label="Total debt"
               value={
                 rental.totalDebt > 0 ? (
-                  <span className="text-red-600 font-medium">
+                  <span className="font-bold text-red-600">
                     {rental.totalDebt} AED
                   </span>
                 ) : (
@@ -224,11 +209,11 @@ export default function RentalDetailPage() {
               }
             />
             {rental.paymentRetryState && (
-              <div className="mt-3 pt-3 border-t border-slate-100">
-                <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-2">
-                  Payment retry
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <p className="text-xs font-bold text-amber-600 uppercase tracking-wide mb-2">
+                  Payment retry state
                 </p>
-                <dl className="space-y-1 text-sm">
+                <dl className="space-y-1.5 text-sm">
                   <Row
                     label="Attempts"
                     value={rental.paymentRetryState.attempts}
@@ -258,23 +243,62 @@ export default function RentalDetailPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-          Action history
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+          Distance compensation
+        </h2>
+        <p className="text-sm text-slate-600 mb-4 font-medium">
+          Compensation given so far:{" "}
+          <span className="font-bold text-slate-900">
+            {rental.compensationDistanceTotal ?? 0} km
+          </span>
+        </p>
+        {compError && (
+          <div className="rounded-xl bg-red-50 border border-red-200 p-3.5 text-sm text-red-600 mb-4">
+            Error: {compError}
+          </div>
+        )}
+        <form
+          onSubmit={handleCompKm}
+          className="flex flex-col sm:flex-row gap-3"
+        >
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            value={compInput}
+            onChange={(e) => setCompInput(e.target.value)}
+            placeholder="Extra km to give"
+            className="w-full sm:w-64 rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            disabled={compSaving || !compInput}
+            className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl disabled:opacity-50 transition shadow-sm"
+          >
+            {compSaving ? "Saving..." : "Add compensation"}
+          </button>
+        </form>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <HiOutlineClock size={18} className="text-blue-600" />
+          <span>Action history</span>
         </h2>
         {rental.actionHistory.length === 0 ? (
           <p className="text-sm text-slate-400">No history.</p>
         ) : (
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-3 text-sm">
             {rental.actionHistory.map((item) => (
               <li
                 key={item.id}
-                className="flex justify-between border-b border-slate-50 pb-2 last:border-0"
+                className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-2.5 last:border-0 gap-1"
               >
-                <span className="text-slate-700 font-medium">
+                <span className="text-slate-800 font-semibold">
                   {item.action}
                 </span>
-                <span className="text-slate-400 text-xs">
+                <span className="text-slate-400 text-xs font-medium">
                   {new Date(item.at).toLocaleString()} · {item.by}
                 </span>
               </li>
@@ -283,27 +307,30 @@ export default function RentalDetailPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
           Customer's rental history
         </h2>
         {rental.userRentalHistory.length === 0 ? (
           <p className="text-sm text-slate-400">No other rentals.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-slate-500 border-b border-slate-100">
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-sm text-left min-w-[500px]">
+              <thead className="text-slate-500 border-b border-slate-100 text-xs uppercase tracking-wider">
                 <tr>
-                  <th className="py-2 pr-4 font-medium">ID</th>
-                  <th className="py-2 pr-4 font-medium">Status</th>
-                  <th className="py-2 pr-4 font-medium">Start</th>
-                  <th className="py-2 font-medium">Price</th>
+                  <th className="py-3 pr-4 font-semibold">ID</th>
+                  <th className="py-3 pr-4 font-semibold">Status</th>
+                  <th className="py-3 pr-4 font-semibold">Start</th>
+                  <th className="py-3 font-semibold">Price</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-100">
                 {rental.userRentalHistory.map((h) => (
-                  <tr key={h.id}>
-                    <td className="py-2 pr-4">
+                  <tr
+                    key={h.id}
+                    className="hover:bg-slate-50/60 transition-colors"
+                  >
+                    <td className="py-3.5 pr-4 font-bold">
                       <Link
                         to={`/rentals/${h.id}`}
                         className="text-blue-600 hover:underline"
@@ -311,11 +338,19 @@ export default function RentalDetailPage() {
                         #{h.id}
                       </Link>
                     </td>
-                    <td className="py-2 pr-4">{h.status}</td>
-                    <td className="py-2 pr-4 text-slate-600">
+                    <td className="py-3.5 pr-4">
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_STYLES[h.status] || "bg-slate-100 text-slate-600"}`}
+                      >
+                        {h.status}
+                      </span>
+                    </td>
+                    <td className="py-3.5 pr-4 text-slate-600 font-medium">
                       {new Date(h.startDate).toLocaleDateString()}
                     </td>
-                    <td className="py-2 text-slate-600">{h.totalPrice} AED</td>
+                    <td className="py-3.5 text-slate-900 font-semibold">
+                      {h.totalPrice} AED
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -329,9 +364,9 @@ export default function RentalDetailPage() {
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex justify-between py-1 border-b border-slate-50 last:border-0">
-      <dt className="text-slate-500">{label}</dt>
-      <dd className="font-medium text-slate-800">{value}</dd>
+    <div className="flex justify-between py-2 border-b border-slate-50 last:border-0">
+      <dt className="text-slate-500 font-medium">{label}</dt>
+      <dd className="font-semibold text-slate-800">{value}</dd>
     </div>
   );
 }

@@ -5,6 +5,13 @@ import {
   deleteTariffPackage,
 } from "../api/tariffs";
 import type { TariffPackage } from "../types/tariff";
+import {
+  HiOutlineDocumentDuplicate,
+  HiOutlinePlus,
+  HiOutlineXMark,
+  HiOutlineExclamationCircle,
+  HiOutlineTrash,
+} from "react-icons/hi2";
 
 const TIME_UNITS = ["Hour", "Day", "Month"];
 
@@ -66,133 +73,173 @@ export default function TariffsPage() {
     }
   }
 
-  if (loading) return <p className="text-slate-500">Loading...</p>;
+  if (loading)
+    return (
+      <div className="py-12 text-center text-slate-500 font-medium">
+        Loading tariffs...
+      </div>
+    );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Tariff Packages</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <HiOutlineDocumentDuplicate className="text-blue-600" size={28} />
+            <span>Tariff Packages</span>
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Manage pricing packages, duration units, and regional limitations.
+          </p>
+        </div>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition"
+          className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2.5 rounded-xl shadow-sm shadow-blue-600/20 transition"
         >
-          {showForm ? "Cancel" : "+ Add package"}
+          {showForm ? (
+            <HiOutlineXMark size={18} />
+          ) : (
+            <HiOutlinePlus size={18} />
+          )}
+          <span>{showForm ? "Cancel" : "Add Package"}</span>
         </button>
       </div>
 
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Error: {error}
+        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+          <HiOutlineExclamationCircle size={20} className="shrink-0" />
+          <span>Error: {error}</span>
         </div>
       )}
 
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6 flex flex-wrap items-end gap-3"
+          className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-4"
         >
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">
-              Unit count
-            </label>
-            <input
-              type="number"
-              min={1}
-              value={unitCount}
-              onChange={(e) => setUnitCount(Number(e.target.value))}
-              className="w-24 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <h3 className="text-base font-bold text-slate-800">
+            Create Tariff Package
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Unit count
+              </label>
+              <input
+                type="number"
+                min={1}
+                required
+                value={unitCount}
+                onChange={(e) => setUnitCount(Number(e.target.value))}
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Time unit
+              </label>
+              <select
+                value={timeUnit}
+                onChange={(e) => setTimeUnit(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {TIME_UNITS.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Price (AED)
+              </label>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                required
+                value={price}
+                onChange={(e) => setPrice(Number(e.target.value))}
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">
-              Time unit
-            </label>
-            <select
-              value={timeUnit}
-              onChange={(e) => setTimeUnit(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={saving}
+              className="text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-5 py-2.5 rounded-xl disabled:opacity-50 transition shadow-sm"
             >
-              {TIME_UNITS.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
-            </select>
+              {saving ? "Saving..." : "Save Package"}
+            </button>
           </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">
-              Price (AED)
-            </label>
-            <input
-              type="number"
-              min={0}
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              className="w-28 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={saving}
-            className="text-sm font-medium text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md disabled:opacity-50 transition"
-          >
-            {saving ? "Saving..." : "Create"}
-          </button>
         </form>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-600 text-left border-b border-slate-200">
-            <tr>
-              <th className="px-4 py-3 font-medium">Package</th>
-              <th className="px-4 py-3 font-medium">Price</th>
-              <th className="px-4 py-3 font-medium">Countries</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {packages.map((pkg) => (
-              <tr
-                key={pkg.id}
-                className="hover:bg-slate-50/70 transition-colors"
-              >
-                <td className="px-4 py-3 font-semibold text-slate-800">
-                  {pkg.unitCount} {pkg.timeUnit}
-                  {pkg.unitCount > 1 ? "s" : ""}
-                </td>
-                <td className="px-4 py-3 text-slate-600">
-                  {pkg.price} {pkg.currency}
-                </td>
-                <td className="px-4 py-3 text-slate-600">
-                  {pkg.countries.map((c) => c.code).join(", ")}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      pkg.isActive
-                        ? "bg-green-100 text-green-700"
-                        : "bg-slate-100 text-slate-600"
-                    }`}
+      {packages.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 font-medium">
+          No tariff packages found.
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-sm text-left min-w-[650px]">
+              <thead className="bg-slate-50/70 text-slate-500 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
+                <tr>
+                  <th className="px-6 py-3.5">Package</th>
+                  <th className="px-6 py-3.5">Price</th>
+                  <th className="px-6 py-3.5">Countries</th>
+                  <th className="px-6 py-3.5">Status</th>
+                  <th className="px-6 py-3.5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {packages.map((pkg) => (
+                  <tr
+                    key={pkg.id}
+                    className="hover:bg-slate-50/60 transition-colors"
                   >
-                    {pkg.isActive ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={() => handleDelete(pkg.id)}
-                    disabled={deletingId === pkg.id}
-                    className="text-xs font-medium text-red-600 hover:underline disabled:opacity-50"
-                  >
-                    {deletingId === pkg.id ? "Deleting..." : "Delete"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <td className="px-6 py-4 font-bold text-slate-900">
+                      {pkg.unitCount} {pkg.timeUnit}
+                      {pkg.unitCount > 1 ? "s" : ""}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-emerald-600">
+                      {pkg.price} {pkg.currency}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600 font-mono text-xs">
+                      {pkg.countries.map((c) => c.code).join(", ") || "All"}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          pkg.isActive
+                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                            : "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
+                        }`}
+                      >
+                        {pkg.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => handleDelete(pkg.id)}
+                        disabled={deletingId === pkg.id}
+                        className="text-xs font-semibold text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-xl transition inline-flex items-center gap-1 disabled:opacity-50"
+                      >
+                        <HiOutlineTrash size={16} />
+                        <span>
+                          {deletingId === pkg.id ? "Deleting..." : "Delete"}
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
