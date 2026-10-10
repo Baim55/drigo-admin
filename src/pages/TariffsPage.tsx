@@ -3,6 +3,7 @@ import {
   getTariffPackages,
   createTariffPackage,
   deleteTariffPackage,
+  updateTariffPackage,
 } from "../api/tariffs";
 import type { TariffPackage } from "../types/tariff";
 import {
@@ -11,6 +12,7 @@ import {
   HiOutlineXMark,
   HiOutlineExclamationCircle,
   HiOutlineTrash,
+  HiOutlinePencilSquare,
 } from "react-icons/hi2";
 
 const TIME_UNITS = ["Hour", "Day", "Month"];
@@ -26,6 +28,8 @@ export default function TariffsPage() {
   const [unitCount, setUnitCount] = useState(1);
   const [timeUnit, setTimeUnit] = useState("Hour");
   const [price, setPrice] = useState(0);
+
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => {
     load();
@@ -44,17 +48,34 @@ export default function TariffsPage() {
     setSaving(true);
     setError("");
     try {
-      await createTariffPackage({ unitCount, timeUnit, price });
-      setShowForm(false);
-      setUnitCount(1);
-      setTimeUnit("Hour");
-      setPrice(0);
+      if (editingId !== null) {
+        await updateTariffPackage(editingId, { unitCount, timeUnit, price });
+      } else {
+        await createTariffPackage({ unitCount, timeUnit, price });
+      }
+      closeForm();
       load();
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setSaving(false);
     }
+  }
+
+  function startEdit(pkg: TariffPackage) {
+    setEditingId(pkg.id);
+    setUnitCount(pkg.unitCount);
+    setTimeUnit(pkg.timeUnit);
+    setPrice(pkg.price);
+    setShowForm(true);
+  }
+
+  function closeForm() {
+    setEditingId(null);
+    setUnitCount(1);
+    setTimeUnit("Hour");
+    setPrice(0);
+    setShowForm(false);
   }
 
   async function handleDelete(id: number) {
@@ -222,6 +243,13 @@ export default function TariffsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => startEdit(pkg)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        <HiOutlinePencilSquare size={16} />
+                        <span>Edit</span>
+                      </button>
                       <button
                         onClick={() => handleDelete(pkg.id)}
                         disabled={deletingId === pkg.id}
