@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getRentalById, endRental } from "../api/rentals";
+import { getRentalById, endRental, compKm } from "../api/rentals";
 import type { RentalDetail } from "../types/rental";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -18,6 +18,9 @@ export default function RentalDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [ending, setEnding] = useState(false);
+  const [compInput, setCompInput] = useState("");
+  const [compSaving, setCompSaving] = useState(false);
+  const [compError, setCompError] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -49,6 +52,29 @@ export default function RentalDetailPage() {
       setError((err as Error).message);
     } finally {
       setEnding(false);
+    }
+  }
+
+  async function handleCompKm(e: React.FormEvent) {
+    e.preventDefault();
+    if (!id) return;
+
+    const distance = Number(compInput);
+    if (!Number.isFinite(distance) || distance <= 0) {
+      setCompError("Enter a distance greater than 0.");
+      return;
+    }
+
+    setCompSaving(true);
+    setCompError("");
+    try {
+      await compKm(Number(id), distance);
+      setCompInput("");
+      loadRental();
+    } catch (err) {
+      setCompError((err as Error).message);
+    } finally {
+      setCompSaving(false);
     }
   }
 
@@ -144,7 +170,40 @@ export default function RentalDetailPage() {
             <Row label="Insurance" value={rental.insurance?.name ?? "None"} />
           </dl>
         </div>
-
+        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+            Distance compensation
+          </h2>
+          <p className="text-sm text-slate-500 mb-3">
+            Compensation given so far:{" "}
+            <span className="font-medium text-slate-800">
+              {rental.compensationDistanceTotal ?? 0} km
+            </span>
+          </p>
+          {compError && (
+            <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600 mb-3">
+              Error: {compError}
+            </div>
+          )}
+          <form onSubmit={handleCompKm} className="flex gap-2">
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              value={compInput}
+              onChange={(e) => setCompInput(e.target.value)}
+              placeholder="Extra km to give"
+              className="w-48 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit"
+              disabled={compSaving || !compInput}
+              className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md disabled:opacity-50 transition"
+            >
+              {compSaving ? "Saving..." : "Add compensation"}
+            </button>
+          </form>
+        </div>
         <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
           <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
             Payment
