@@ -39,3 +39,15 @@ export function compKm(id: number, km: number) {
     body: JSON.stringify({ km }),
   });
 }
+
+export function changeRentalStatus(id: number, status: string) {
+  return apiClient<unknown>(
+    `/api/admin/rentals/${id}/status?status=${encodeURIComponent(status)}`,
+  );
+}
+
+export function switchRentalCar(id: number, carId: number) {
+  return apiClient<unknown>(
+    `/api/admin/rentals/${id}/switch-car?carId=${carId}`,
+  );
+}

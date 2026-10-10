@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getRentalById, endRental, compKm } from "../api/rentals";
+import {
+  getRentalById,
+  endRental,
+  compKm,
+  switchRentalCar,
+  changeRentalStatus,
+} from "../api/rentals";
 import type { RentalDetail } from "../types/rental";
 import {
   HiOutlineArrowLongLeft,
@@ -10,6 +16,8 @@ import {
   HiOutlineCreditCard,
   HiOutlineClock,
 } from "react-icons/hi2";
+import { getAvailableCars } from "../api/cars";
+import type { Car } from "../types/car";
 
 const STATUS_STYLES: Record<string, string> = {
   Active: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
@@ -30,10 +38,22 @@ export default function RentalDetailPage() {
   const [compSaving, setCompSaving] = useState(false);
   const [compError, setCompError] = useState("");
 
+  const [newStatus, setNewStatus] = useState("");
+  const [availableCars, setAvailableCars] = useState<Car[]>([]);
+  const [targetCarId, setTargetCarId] = useState("");
+  const [opBusy, setOpBusy] = useState(false);
+  const [opError, setOpError] = useState("");
+
   useEffect(() => {
     if (!id) return;
     loadRental();
   }, [id]);
+
+  useEffect(() => {
+    getAvailableCars()
+      .then(setAvailableCars)
+      .catch(() => {});
+  }, []);
 
   function loadRental() {
     if (!id) return;
@@ -83,6 +103,40 @@ export default function RentalDetailPage() {
       setCompError((err as Error).message);
     } finally {
       setCompSaving(false);
+    }
+  }
+
+  async function handleChangeStatus() {
+    if (!id || !newStatus) return;
+    if (!window.confirm(`Change rental status to ${newStatus}?`)) return;
+
+    setOpBusy(true);
+    setOpError("");
+    try {
+      await changeRentalStatus(Number(id), newStatus);
+      setNewStatus("");
+      loadRental();
+    } catch (err) {
+      setOpError((err as Error).message);
+    } finally {
+      setOpBusy(false);
+    }
+  }
+
+  async function handleSwitchCar() {
+    if (!id || !targetCarId) return;
+    if (!window.confirm("Switch this rental to the selected car?")) return;
+
+    setOpBusy(true);
+    setOpError("");
+    try {
+      await switchRentalCar(Number(id), Number(targetCarId));
+      setTargetCarId("");
+      loadRental();
+    } catch (err) {
+      setOpError((err as Error).message);
+    } finally {
+      setOpBusy(false);
     }
   }
 
@@ -280,6 +334,82 @@ export default function RentalDetailPage() {
           </button>
         </form>
       </div>
+
+      {(rental.status === "Active" || rental.status === "Started") && (
+        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+            Rental operations
+          </h2>
+
+          {opError && (
+            <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600 mb-4">
+              Error: {opError}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">
+                Change status
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="rounded-md border border-slate-300 px-3 py-2 text-sm bg-white"
+                >
+                  <option value="">Select status</option>
+                  {[
+                    "Active",
+                    "Started",
+                    "Completed",
+                    "Cancelled",
+                    "Accident",
+                  ].map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleChangeStatus}
+                  disabled={opBusy || !newStatus}
+                  className="text-sm font-medium text-white bg-slate-700 hover:bg-slate-800 px-4 py-2 rounded-md disabled:opacity-50 transition"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">
+                Switch car
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={targetCarId}
+                  onChange={(e) => setTargetCarId(e.target.value)}
+                  className="rounded-md border border-slate-300 px-3 py-2 text-sm bg-white"
+                >
+                  <option value="">Select available car</option>
+                  {availableCars.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.brandName} {c.modelName} ({c.plateNumber})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleSwitchCar}
+                  disabled={opBusy || !targetCarId}
+                  className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md disabled:opacity-50 transition"
+                >
+                  Switch
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
