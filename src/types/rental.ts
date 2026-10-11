@@ -97,6 +97,7 @@ export interface RentalDetail extends Rental {
   paymentRetryState: PaymentRetryState | null;
   cancelReason: string | null;
   hasAccident: boolean;
+  compensationDistanceTotal: number;
 }
 
 export interface PaymentRetryState {

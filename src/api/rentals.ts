@@ -32,3 +32,10 @@ export function getRentalById(id: number) {
 export function endRental(id: number) {
   return apiClient<RentalDetail>(`/api/admin/rentals/${id}/end`);
 }
+
+export function compKm(id: number, km: number) {
+  return apiClient<unknown>(`/api/admin/rentals/${id}/comp-km`, {
+    method: "POST",
+    body: JSON.stringify({ km }),
+  });
+}
