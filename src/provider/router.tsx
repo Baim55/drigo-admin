@@ -32,6 +32,7 @@ import DeliveriesPage from "../pages/DeliveriesPage";
 import PromoCodesPage from "../pages/PromoCodesPage";
 import PromotionsPage from "../pages/PromotionsPage";
 import StoriesPage from "../pages/StoriesPage";
+import AnalyticsInsightsPage from "../pages/AnalyticsInsightsPage";
 
 export const router = createBrowserRouter([
   {
@@ -121,6 +122,14 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code="support.view">
                 <SupportPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/analytics/insights",
+            element: (
+              <RequirePermission code="analytics.view">
+                <AnalyticsInsightsPage />
               </RequirePermission>
             ),
           },
