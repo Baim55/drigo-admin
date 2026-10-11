@@ -7,6 +7,7 @@ import {
   HiOutlineTrash,
   HiOutlineExclamationCircle,
 } from "react-icons/hi2";
+import { Link } from "react-router-dom";
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -114,7 +115,6 @@ export default function BrandsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          {/* overflow-x-auto və custom-scrollbar əlavə edildi */}
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-sm text-left min-w-[500px]">
               <thead className="bg-slate-50/70 text-slate-500 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
@@ -135,7 +135,12 @@ export default function BrandsPage() {
                       <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs">
                         {b.name.charAt(0)}
                       </div>
-                      {b.name}
+                      <Link
+                        to={`/brands/${b.id}`}
+                        className="hover:text-blue-600 hover:underline"
+                      >
+                        {b.name}
+                      </Link>
                     </td>
                     <td className="px-6 py-4 text-slate-600 font-medium">
                       {b.carCount} cars

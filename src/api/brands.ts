@@ -48,3 +48,23 @@ export function deleteBrand(id: number) {
     method: "DELETE",
   });
 }
+
+export function createBrandModel(
+  brandId: number,
+  data: { name: string; seats: number; maxSpeed: number },
+) {
+  return apiClient<unknown>(`/api/admin/brands/${brandId}/models`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function createBrandColor(
+  brandId: number,
+  data: { name: string; hexCode: string },
+) {
+  return apiClient<unknown>(`/api/admin/brands/${brandId}/colors`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
