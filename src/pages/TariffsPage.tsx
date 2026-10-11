@@ -18,7 +18,7 @@ export default function TariffsPage() {
 
   const [unitCount, setUnitCount] = useState(1);
   const [timeUnit, setTimeUnit] = useState("Hour");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState<number | "">(0);
 
   useEffect(() => {
     load();
@@ -37,7 +37,11 @@ export default function TariffsPage() {
     setSaving(true);
     setError("");
     try {
-      await createTariffPackage({ unitCount, timeUnit, price });
+      await createTariffPackage({
+        unitCount,
+        timeUnit,
+        price: price === "" ? 0 : Number(price),
+      });
       setShowForm(false);
       setUnitCount(1);
       setTimeUnit("Hour");
@@ -127,7 +131,9 @@ export default function TariffsPage() {
               type="number"
               min={0}
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
+              onChange={(e) =>
+                setPrice(e.target.value === "" ? "" : Number(e.target.value))
+              }
               className="w-28 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
