@@ -23,6 +23,7 @@ import AnalyticsPage from "../pages/AnalyticsPage";
 import TariffsPage from "../pages/TariffsPage";
 import DiscountsPage from "../pages/DiscountsPage";
 import SettingsPage from "../pages/SettingsPage";
+import GeoZonesPage from "../pages/GeoZonesPage";
 
 export const router = createBrowserRouter([
   {
@@ -90,6 +91,10 @@ export const router = createBrowserRouter([
           {
             path: "/settings",
             element: <SettingsPage />,
+          },
+          {
+            path: "/geozones",
+            element: <GeoZonesPage />,
           },
           {
             path: "/cars/:id",
