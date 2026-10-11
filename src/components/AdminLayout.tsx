@@ -120,6 +120,12 @@ const NAV_LINKS = [
     icon: HiOutlineTruck,
     permission: "delivery.view",
   },
+  {
+    to: "/promo-codes",
+    label: "Promo codes",
+    icon: HiOutlineTag,
+    permission: "promotions.view",
+  },
 ];
 
 export default function AdminLayout() {

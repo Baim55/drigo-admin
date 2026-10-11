@@ -29,6 +29,7 @@ import BrandsPage from "../pages/BrandsPage";
 import AccidentsPage from "../pages/AccidentsPage";
 import BrandDetailPage from "../pages/BrandDetailPage";
 import DeliveriesPage from "../pages/DeliveriesPage";
+import PromoCodesPage from "../pages/PromoCodesPage";
 
 export const router = createBrowserRouter([
   {
@@ -190,6 +191,14 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code="delivery.view">
                 <DeliveriesPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/promo-codes",
+            element: (
+              <RequirePermission code="promotions.view">
+                <PromoCodesPage />
               </RequirePermission>
             ),
           },
