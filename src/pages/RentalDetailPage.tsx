@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getRentalById, endRental, compKm } from "../api/rentals";
 import type { RentalDetail } from "../types/rental";
+<<<<<<< HEAD
 import {
   HiOutlineArrowLongLeft,
   HiOutlineExclamationCircle,
@@ -10,6 +11,9 @@ import {
   HiOutlineCreditCard,
   HiOutlineClock,
 } from "react-icons/hi2";
+=======
+import PaymentsCard from "../components/PaymentsCard";
+>>>>>>> main
 
 const STATUS_STYLES: Record<string, string> = {
   Active: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",

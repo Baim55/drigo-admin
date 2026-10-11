@@ -25,7 +25,7 @@ export default function TariffsPage() {
 
   const [unitCount, setUnitCount] = useState(1);
   const [timeUnit, setTimeUnit] = useState("Hour");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState<number | "">(0);
 
   useEffect(() => {
     load();
@@ -44,7 +44,11 @@ export default function TariffsPage() {
     setSaving(true);
     setError("");
     try {
-      await createTariffPackage({ unitCount, timeUnit, price });
+      await createTariffPackage({
+        unitCount,
+        timeUnit,
+        price: price === "" ? 0 : Number(price),
+      });
       setShowForm(false);
       setUnitCount(1);
       setTimeUnit("Hour");
@@ -117,53 +121,45 @@ export default function TariffsPage() {
           onSubmit={handleCreate}
           className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-4"
         >
-          <h3 className="text-base font-bold text-slate-800">
-            Create Tariff Package
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                Unit count
-              </label>
-              <input
-                type="number"
-                min={1}
-                required
-                value={unitCount}
-                onChange={(e) => setUnitCount(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                Time unit
-              </label>
-              <select
-                value={timeUnit}
-                onChange={(e) => setTimeUnit(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {TIME_UNITS.map((u) => (
-                  <option key={u} value={u}>
-                    {u}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                Price (AED)
-              </label>
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                required
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">
+              Unit count
+            </label>
+            <input
+              type="number"
+              min={1}
+              value={unitCount}
+              onChange={(e) => setUnitCount(Number(e.target.value))}
+              className="w-24 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">
+              Time unit
+            </label>
+            <select
+              value={timeUnit}
+              onChange={(e) => setTimeUnit(e.target.value)}
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {TIME_UNITS.map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">
+              Price (AED)
+            </label>
+            <input
+              type="number"
+              min={0}
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              className="w-28 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div className="flex justify-end pt-2">
             <button
