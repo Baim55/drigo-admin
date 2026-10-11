@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getCustomerById, verifyCustomer } from "../api/customers";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  getCustomerById,
+  verifyCustomer,
+  blockCustomer,
+  restoreCustomer,
+  deleteCustomer,
+} from "../api/customers";
 import type { CustomerDetail, DocumentDetail } from "../types/customer";
 
 export default function CustomerDetailPage() {
@@ -9,6 +15,10 @@ export default function CustomerDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [verifying, setVerifying] = useState(false);
+
+  const navigate = useNavigate();
+  const [actionError, setActionError] = useState("");
+  const [working, setWorking] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -46,6 +56,59 @@ export default function CustomerDetailPage() {
     }
   }
 
+  async function handleBlockToggle() {
+    if (!id || !customer) return;
+    const willBlock = !customer.isBlocked;
+    const confirmed = window.confirm(
+      willBlock ? "Block this customer?" : "Unblock this customer?",
+    );
+    if (!confirmed) return;
+
+    setWorking(true);
+    setActionError("");
+    try {
+      await blockCustomer(id, willBlock);
+      loadCustomer();
+    } catch (err) {
+      setActionError((err as Error).message);
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function handleRestore() {
+    if (!id) return;
+    setWorking(true);
+    setActionError("");
+    try {
+      await restoreCustomer(id);
+      loadCustomer();
+    } catch (err) {
+      setActionError((err as Error).message);
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!id) return;
+    const confirmed = window.confirm(
+      "Delete this customer? It can be restored later.",
+    );
+    if (!confirmed) return;
+
+    setWorking(true);
+    setActionError("");
+    try {
+      await deleteCustomer(id);
+      navigate("/customers");
+    } catch (err) {
+      setActionError((err as Error).message);
+    } finally {
+      setWorking(false);
+    }
+  }
+
   if (loading) return <p className="text-slate-500">Loading...</p>;
 
   if (error) {
@@ -59,7 +122,7 @@ export default function CustomerDetailPage() {
   if (!customer) return null;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       <Link
         to="/customers"
         className="text-sm text-blue-600 hover:underline mb-4 inline-block"
@@ -95,6 +158,11 @@ export default function CustomerDetailPage() {
                 Blocked
               </span>
             )}
+            {customer.isDeleted && (
+              <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 ring-1 ring-slate-200">
+                Deleted
+              </span>
+            )}
             {customer.isVerified ? (
               <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-green-50 text-green-700 ring-1 ring-green-200">
                 Verified
@@ -124,6 +192,41 @@ export default function CustomerDetailPage() {
             </button>
           </div>
         )}
+
+        {actionError && (
+          <div className="mt-4 rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">
+            Error: {actionError}
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">
+          {customer.isDeleted ? (
+            <button
+              onClick={handleRestore}
+              disabled={working}
+              className="text-sm font-medium px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition"
+            >
+              Restore customer
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleBlockToggle}
+                disabled={working}
+                className="text-sm font-medium px-4 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition"
+              >
+                {customer.isBlocked ? "Unblock" : "Block"}
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={working}
+                className="text-sm font-medium px-4 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <DocumentCard title="Passport" doc={customer.passportDetail} />
