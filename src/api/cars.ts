@@ -130,3 +130,9 @@ export interface ProblematicCar extends Car {
 export function getProblematicCars() {
   return apiClient<ProblematicCar[]>("/api/admin/cars/problematic");
 }
+
+export function getAvailableCars() {
+  return getCars({ pageSize: 100 }).then((res) =>
+    res.data.filter((c) => c.isActive && c.activeRentalId === null),
+  );
+}
