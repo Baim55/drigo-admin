@@ -28,6 +28,12 @@ export default function AdminLayout() {
             Dashboard
           </Link>
           <Link
+            to="/brands"
+            className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition"
+          >
+            Brands
+          </Link>
+          <Link
             to="/cars"
             className="block px-3 py-2 rounded-md hover:bg-slate-800 text-sm font-medium transition"
           >

@@ -35,3 +35,16 @@ export function getBrandModels(brandId: number) {
 export function getBrandColors(brandId: number) {
   return apiClient<BrandColor[]>(`/api/admin/brands/${brandId}/colors`);
 }
+
+export function createBrand(name: string) {
+  return apiClient<Brand>("/api/admin/brands", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+}
+
+export function deleteBrand(id: number) {
+  return apiClient<{ success: boolean }>(`/api/admin/brands/${id}`, {
+    method: "DELETE",
+  });
+}
