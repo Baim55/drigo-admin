@@ -22,3 +22,20 @@ export interface DashboardKpis {
     company: number;
   };
 }
+
+export interface CountPoint {
+  date: string;
+  count: number;
+}
+
+export interface RevenuePoint {
+  date: string;
+  revenue: number;
+}
+
+export interface DashboardTrends {
+  rentalTrends: CountPoint[];
+  reservationTrends: CountPoint[];
+  revenueTrends: RevenuePoint[];
+  userRegistrationTrends: CountPoint[];
+}

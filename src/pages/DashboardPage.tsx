@@ -1,17 +1,36 @@
 import { useEffect, useState } from "react";
-import { getKpis } from "../api/dashboard";
-import type { DashboardKpis } from "../types/dashboard";
+import { getKpis, getTrends } from "../api/dashboard";
+import type { DashboardKpis, DashboardTrends } from "../types/dashboard";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 export default function DashboardPage() {
   const [kpis, setKpis] = useState<DashboardKpis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [trends, setTrends] = useState<DashboardTrends | null>(null);
+  const [trendsError, setTrendsError] = useState("");
 
   useEffect(() => {
     getKpis()
       .then(setKpis)
       .catch((err) => setError((err as Error).message))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    getTrends()
+      .then(setTrends)
+      .catch((err) => setTrendsError((err as Error).message));
   }, []);
 
   if (loading) {
@@ -66,6 +85,96 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+      {trendsError && (
+        <div className="mt-6 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          Trends error: {trendsError}
+        </div>
+      )}
+
+      {trends && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <ChartCard title="Revenue (last 14 days)">
+            <LineChart data={trends.revenueTrends}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 11 }}
+                tickFormatter={(d) => d.slice(5)}
+              />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ChartCard>
+
+          <ChartCard title="Rentals per day">
+            <BarChart data={trends.rentalTrends}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 11 }}
+                tickFormatter={(d) => d.slice(5)}
+              />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ChartCard>
+
+          <ChartCard title="Reservations per day">
+            <BarChart data={trends.reservationTrends}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 11 }}
+                tickFormatter={(d) => d.slice(5)}
+              />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#a855f7" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ChartCard>
+
+          <ChartCard title="New users per day">
+            <BarChart data={trends.userRegistrationTrends}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 11 }}
+                tickFormatter={(d) => d.slice(5)}
+              />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ChartCard>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChartCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactElement;
+}) {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
+      <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+        {title}
+      </h2>
+      <ResponsiveContainer width="100%" height={220}>
+        {children}
+      </ResponsiveContainer>
     </div>
   );
 }
