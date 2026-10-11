@@ -32,3 +32,37 @@ export interface SupportMessage {
   isBot: boolean;
   botMessageKind: string | null;
 }
+
+export interface SupportContext {
+  member: {
+    id: string;
+    fullName: string;
+    phoneNumber: string;
+    email: string | null;
+    isVerified: boolean;
+    isBlocked: boolean;
+    createdAt: string;
+    bonusBalance: number;
+  };
+  verification: {
+    passport: string;
+    driverLicense: string;
+    face: string;
+  };
+  activeRental: {
+    id: number;
+    status: string;
+    startDate: string;
+    car: string;
+  } | null;
+  outstandingDebt: {
+    total: number;
+    count: number;
+    currency: string;
+  };
+  flags: {
+    hasDebt: boolean;
+    isBlocked: boolean;
+    unverified: boolean;
+  };
+}
