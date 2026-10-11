@@ -3,6 +3,14 @@ import { getCars } from "../api/cars";
 import type { Car } from "../types/car";
 import { Link } from "react-router-dom";
 import CreateCarModal from "../components/CreateCarModal";
+import {
+  HiOutlineTruck,
+  HiOutlinePlus,
+  HiOutlineExclamationCircle,
+  HiOutlineMagnifyingGlass,
+  HiOutlineChevronLeft,
+  HiOutlineChevronRight,
+} from "react-icons/hi2";
 
 type SortField = "manufactureYear" | "plateNumber" | "fuelLevel";
 type SortOrder = "asc" | "desc";
@@ -99,45 +107,60 @@ export default function CarsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Cars</h1>
-        <div className="flex items-center gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <HiOutlineTruck className="text-blue-600" size={28} />
+            <span>Cars Management</span>
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Manage fleet vehicles, track telemetry, and inspect details.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
           <Link
             to="/cars/problematic"
-            className="text-sm font-medium text-red-600 hover:underline"
+            className="text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3.5 py-2 rounded-xl transition"
           >
             Problematic cars
           </Link>
           <Link
             to="/cars/tracking"
-            className="text-sm font-medium text-blue-600 hover:underline"
+            className="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3.5 py-2 rounded-xl transition"
           >
             View live map →
           </Link>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition"
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2.5 rounded-xl shadow-sm shadow-blue-600/20 transition"
           >
-            + Add car
+            <HiOutlinePlus size={18} />
+            <span>Add car</span>
           </button>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <input
-          placeholder="Search (brand, model, plate...)"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full max-w-sm rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="relative flex-1 w-full max-w-sm">
+          <HiOutlineMagnifyingGlass
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+            size={18}
+          />
+          <input
+            placeholder="Search (brand, model, plate...)"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          />
+        </div>
         <select
           value={activeFilter}
           onChange={(e) => {
             setActiveFilter(e.target.value as ActiveFilter);
             setPage(1);
           }}
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="rounded-xl border border-slate-300 px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
         >
           <option value="all">All statuses</option>
           <option value="active">Active</option>
@@ -146,11 +169,14 @@ export default function CarsPage() {
       </div>
 
       {error && (
-        <div className="flex items-center justify-between rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          <span>Error: {error}</span>
+        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <HiOutlineExclamationCircle size={20} className="shrink-0" />
+            <span>Error: {error}</span>
+          </div>
           <button
             onClick={() => setRefreshKey((k) => k + 1)}
-            className="font-medium underline"
+            className="font-semibold underline text-xs"
           >
             Retry
           </button>
@@ -158,50 +184,54 @@ export default function CarsPage() {
       )}
 
       {loading && filteredCars.length === 0 && (
-        <p className="text-slate-500">Loading...</p>
+        <div className="py-12 text-center text-slate-500 font-medium">
+          Loading cars...
+        </div>
       )}
 
       {!loading && !error && filteredCars.length === 0 && (
-        <p className="text-slate-500">No cars found.</p>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 font-medium">
+          No cars found.
+        </div>
       )}
 
       {filteredCars.length > 0 && (
-        <>
+        <div className="space-y-4">
           <div
-            className={`bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-opacity ${
+            className={`bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-opacity ${
               loading ? "opacity-50" : ""
             }`}
           >
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-600 text-left border-b border-slate-200">
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full text-sm text-left min-w-[700px]">
+                <thead className="bg-slate-50/70 text-slate-500 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
                   <tr>
-                    <th className="px-4 py-3 font-medium">ID</th>
-                    <th className="px-4 py-3 font-medium">Brand / Model</th>
+                    <th className="px-5 py-3.5">ID</th>
+                    <th className="px-5 py-3.5">Brand / Model</th>
                     {SORTABLE_COLUMNS.map((col) => (
                       <th
                         key={col.field}
                         onClick={() => handleSort(col.field)}
-                        className="px-4 py-3 font-medium cursor-pointer select-none hover:text-slate-900"
+                        className="px-5 py-3.5 font-semibold cursor-pointer select-none hover:text-slate-900 transition"
                       >
                         {col.label}
                         {sortIndicator(col.field)}
                       </th>
                     ))}
-                    <th className="px-4 py-3 font-medium">Color</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-5 py-3.5">Color</th>
+                    <th className="px-5 py-3.5">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {filteredCars.map((car) => (
                     <tr
                       key={car.id}
-                      className="hover:bg-slate-50/70 transition-colors"
+                      className="hover:bg-slate-50/60 transition-colors"
                     >
-                      <td className="px-4 py-3 text-slate-400 font-mono text-xs">
+                      <td className="px-5 py-4 text-slate-400 font-mono text-xs">
                         #{car.id}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-800">
+                      <td className="px-5 py-4 font-bold text-slate-900">
                         <Link
                           to={`/cars/${car.id}`}
                           className="hover:text-blue-600 hover:underline"
@@ -209,35 +239,39 @@ export default function CarsPage() {
                           {car.brandName} {car.modelName}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-5 py-4 text-slate-600 font-medium">
                         {car.manufactureYear}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-5 py-4 text-slate-600 font-mono text-xs">
                         {car.plateNumber}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-5 py-4 text-slate-600 font-medium">
                         {car.fuelLevel.toFixed(0)}%
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        <span
-                          className="inline-block w-3 h-3 rounded-full mr-2 align-middle border border-slate-200"
-                          style={{ backgroundColor: car.colorHexCode }}
-                        />
-                        {car.colorName}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-1">
+                      <td className="px-5 py-4 text-slate-600">
+                        <div className="flex items-center gap-2">
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            className="inline-block w-3 h-3 rounded-full border border-slate-200 shadow-xs"
+                            style={{ backgroundColor: car.colorHexCode }}
+                          />
+                          <span className="font-medium text-xs">
+                            {car.colorName}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
                               car.isActive
-                                ? "bg-green-100 text-green-700"
-                                : "bg-slate-100 text-slate-600"
+                                ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                                : "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
                             }`}
                           >
                             {car.isActive ? "Active" : "Inactive"}
                           </span>
                           {car.activeRentalId !== null && (
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-200">
                               Rented
                             </span>
                           )}
@@ -250,29 +284,36 @@ export default function CarsPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-slate-500">
-              Showing {filteredCars.length} of {total} cars, page {page}/
-              {totalPages}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-1">
+            <p className="text-xs font-medium text-slate-500">
+              Showing{" "}
+              <span className="font-bold text-slate-700">
+                {filteredCars.length}
+              </span>{" "}
+              of <span className="font-bold text-slate-700">{total}</span> cars,
+              page <span className="font-bold text-slate-700">{page}</span>/
+              <span className="font-bold text-slate-700">{totalPages}</span>
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1 || loading}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition bg-white"
               >
-                Previous
+                <HiOutlineChevronLeft size={16} />
+                <span>Previous</span>
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages || loading}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition bg-white"
               >
-                Next
+                <span>Next</span>
+                <HiOutlineChevronRight size={16} />
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {showCreateModal && (

@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getSupports } from "../api/support";
 import type { SupportTicket, SupportStatus } from "../types/support";
+import {
+  HiOutlineChatBubbleBottomCenterText,
+  HiOutlineExclamationCircle,
+  HiOutlineChevronLeft,
+  HiOutlineChevronRight,
+} from "react-icons/hi2";
 
 const STATUS_OPTIONS: { value: SupportStatus | ""; label: string }[] = [
   { value: "", label: "All" },
@@ -14,7 +20,7 @@ const STATUS_OPTIONS: { value: SupportStatus | ""; label: string }[] = [
 const STATUS_STYLES: Record<SupportStatus, string> = {
   Open: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
   Pending: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
-  Resolved: "bg-green-50 text-green-700 ring-1 ring-green-200",
+  Resolved: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
   Closed: "bg-slate-100 text-slate-500 ring-1 ring-slate-200",
 };
 
@@ -44,21 +50,33 @@ export default function SupportPage() {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Support</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <HiOutlineChatBubbleBottomCenterText
+            className="text-blue-600"
+            size={28}
+          />
+          <span>Support Tickets</span>
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Manage customer inquiries, live chat messages, and support ticket
+          statuses.
+        </p>
+      </div>
 
-      <div className="flex gap-1 mb-4">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
         {STATUS_OPTIONS.map((opt) => (
           <button
-            key={opt.value}
+            key={opt.value || "all"}
             onClick={() => {
               setStatus(opt.value);
               setPage(1);
             }}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
               status === opt.value
-                ? "bg-slate-800 text-white"
-                : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
             }`}
           >
             {opt.label}
@@ -66,55 +84,62 @@ export default function SupportPage() {
         ))}
       </div>
 
-      {loading && <p className="text-slate-500">Loading...</p>}
+      {loading && (
+        <div className="py-12 text-center text-slate-500 font-medium">
+          Loading support tickets...
+        </div>
+      )}
 
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Error: {error}
+        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+          <HiOutlineExclamationCircle size={20} className="shrink-0" />
+          <span>Error: {error}</span>
         </div>
       )}
 
       {!loading && !error && tickets.length === 0 && (
-        <p className="text-slate-500">No tickets found.</p>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 font-medium">
+          No tickets found.
+        </div>
       )}
 
       {!loading && !error && tickets.length > 0 && (
-        <>
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden divide-y divide-slate-100">
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden divide-y divide-slate-100">
             {tickets.map((t) => (
               <Link
                 key={t.id}
                 to={`/support/${t.id}`}
-                className="flex items-center justify-between px-5 py-4 hover:bg-slate-50/70 transition-colors"
+                className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/60 transition-colors"
               >
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-3.5 min-w-0">
                   {t.hasUnread && (
-                    <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0 shadow-xs" />
                   )}
                   <div className="min-w-0">
-                    <p className="font-semibold text-slate-800 truncate">
-                      {t.memberName}
-                      <span className="text-slate-400 font-normal ml-2 text-xs">
+                    <p className="font-bold text-slate-900 truncate flex items-center gap-2">
+                      <span>{t.memberName}</span>
+                      <span className="text-slate-400 font-normal text-xs bg-slate-100 px-2.5 py-0.5 rounded-md">
                         {t.reasonName}
                       </span>
                     </p>
-                    <p className="text-sm text-slate-500 truncate">
+                    <p className="text-sm text-slate-500 truncate mt-0.5">
                       {t.lastMessage}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                   {t.unreadCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                      {t.unreadCount}
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600 ring-1 ring-red-200">
+                      {t.unreadCount} unread
                     </span>
                   )}
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[t.status]}`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[t.status]}`}
                   >
                     {t.status}
                   </span>
-                  <span className="text-xs text-slate-400 w-20 text-right">
+                  <span className="text-xs font-medium text-slate-400 w-20 text-right hidden sm:block">
                     {new Date(t.lastMessageAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -122,28 +147,33 @@ export default function SupportPage() {
             ))}
           </div>
 
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-slate-500">
-              Total {total} tickets, page {page}/{totalPages}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-1">
+            <p className="text-xs font-medium text-slate-500">
+              Total <span className="font-bold text-slate-700">{total}</span>{" "}
+              tickets, page{" "}
+              <span className="font-bold text-slate-700">{page}</span>/
+              <span className="font-bold text-slate-700">{totalPages}</span>
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition bg-white"
               >
-                Previous
+                <HiOutlineChevronLeft size={16} />
+                <span>Previous</span>
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition bg-white"
               >
-                Next
+                <span>Next</span>
+                <HiOutlineChevronRight size={16} />
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

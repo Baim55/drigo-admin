@@ -8,6 +8,24 @@ import {
   type DeliveryDriver,
 } from "../api/reservations";
 import type { Reservation } from "../types/reservation";
+import {
+  HiOutlineArrowLongLeft,
+  HiOutlineExclamationCircle,
+  HiOutlineCalendarDays,
+  HiOutlineUserGroup,
+} from "react-icons/hi2";
+
+const STATUS_STYLES: Record<string, string> = {
+  Pending: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  Confirmed: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
+  DriverAssigned: "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200",
+  PickingUp: "bg-cyan-50 text-cyan-700 ring-1 ring-cyan-200",
+  InDelivery: "bg-purple-50 text-purple-700 ring-1 ring-purple-200",
+  Delivered: "bg-teal-50 text-teal-700 ring-1 ring-teal-200",
+  Completed: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+  Cancelled: "bg-slate-100 text-slate-500 ring-1 ring-slate-200",
+  Expired: "bg-red-50 text-red-700 ring-1 ring-red-200",
+};
 
 export default function ReservationDetailPage() {
   const { id } = useParams();
@@ -68,12 +86,18 @@ export default function ReservationDetailPage() {
     }
   }
 
-  if (loading) return <p className="text-slate-500">Loading...</p>;
+  if (loading)
+    return (
+      <div className="py-12 text-center text-slate-500 font-medium">
+        Loading reservation details...
+      </div>
+    );
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-        Error: {error}
+      <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+        <HiOutlineExclamationCircle size={20} className="shrink-0" />
+        <span>Error: {error}</span>
       </div>
     );
   }
@@ -96,30 +120,34 @@ export default function ReservationDetailPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
       <Link
         to="/reservations"
-        className="text-sm text-blue-600 hover:underline mb-4 inline-block"
+        className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1.5"
       >
-        ← Back to reservations
+        <HiOutlineArrowLongLeft size={20} />
+        <span>Back to reservations</span>
       </Link>
 
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
-              {reservation.customerName}
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <HiOutlineCalendarDays className="text-blue-600" size={26} />
+              <span>{reservation.customerName}</span>
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm font-medium text-slate-500 mt-1 font-mono">
               {reservation.customerPhone}
             </p>
           </div>
-          <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-200">
+          <span
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold ${STATUS_STYLES[reservation.status] || "bg-slate-100 text-slate-600"}`}
+          >
             {reservation.status}
           </span>
         </div>
 
-        <dl className="space-y-2 text-sm mb-4">
+        <dl className="space-y-3 text-sm mb-6">
           <Row
             label="Car"
             value={`${reservation.carName} (${reservation.plateNumber})`}
@@ -147,7 +175,7 @@ export default function ReservationDetailPage() {
           <button
             onClick={handleCancel}
             disabled={cancelling}
-            className="text-sm font-medium px-4 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
+            className="text-xs font-semibold px-4 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 transition shadow-xs"
           >
             {cancelling ? "Cancelling..." : "Cancel reservation"}
           </button>
@@ -155,21 +183,22 @@ export default function ReservationDetailPage() {
       </div>
 
       {canAssignDriver && (
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-            Assign driver
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <HiOutlineUserGroup size={18} className="text-blue-600" />
+            <span>Assign driver</span>
           </h2>
 
           {availableDrivers.length === 0 ? (
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-400 font-medium">
               No available drivers right now.
             </p>
           ) : (
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-3">
               <select
                 value={selectedDriverId}
                 onChange={(e) => setSelectedDriverId(Number(e.target.value))}
-                className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 rounded-xl border border-slate-300 px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a driver</option>
                 {availableDrivers.map((d) => (
@@ -181,9 +210,9 @@ export default function ReservationDetailPage() {
               <button
                 onClick={handleAssignDriver}
                 disabled={!selectedDriverId || assigning}
-                className="text-sm font-medium px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition"
+                className="text-sm font-semibold px-5 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-sm"
               >
-                {assigning ? "Assigning..." : "Assign"}
+                {assigning ? "Assigning..." : "Assign Driver"}
               </button>
             </div>
           )}
@@ -195,9 +224,9 @@ export default function ReservationDetailPage() {
 
 function Row({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex justify-between py-1 border-b border-slate-50 last:border-0">
-      <dt className="text-slate-500">{label}</dt>
-      <dd className="font-medium text-slate-800">{value}</dd>
+    <div className="flex justify-between py-2 border-b border-slate-50 last:border-0">
+      <dt className="text-slate-500 font-medium">{label}</dt>
+      <dd className="font-semibold text-slate-800">{value}</dd>
     </div>
   );
 }

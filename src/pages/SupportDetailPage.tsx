@@ -6,6 +6,11 @@ import {
   updateSupportStatus,
 } from "../api/support";
 import type { SupportMessage, SupportStatus } from "../types/support";
+import {
+  HiOutlineArrowLongLeft,
+  HiOutlineExclamationCircle,
+  HiOutlinePaperAirplane,
+} from "react-icons/hi2";
 
 const STATUS_OPTIONS: SupportStatus[] = [
   "Open",
@@ -71,19 +76,28 @@ export default function SupportDetailPage() {
     }
   }
 
-  if (loading) return <p className="text-slate-500">Loading...</p>;
+  if (loading)
+    return (
+      <div className="py-12 text-center text-slate-500 font-medium">
+        Loading chat...
+      </div>
+    );
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <Link to="/support" className="text-sm text-blue-600 hover:underline">
-          ← Back to support
+    <div className="space-y-6 max-w-3xl mx-auto">
+      <div className="flex items-center justify-between gap-4">
+        <Link
+          to="/support"
+          className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1.5"
+        >
+          <HiOutlineArrowLongLeft size={20} />
+          <span>Back to support</span>
         </Link>
         <select
           onChange={(e) => handleStatusChange(e.target.value as SupportStatus)}
           disabled={updatingStatus}
           defaultValue=""
-          className="text-sm rounded-md border border-slate-300 px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="text-xs font-semibold rounded-xl border border-slate-300 px-3.5 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="" disabled>
             Change status...
@@ -97,37 +111,43 @@ export default function SupportDetailPage() {
       </div>
 
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Error: {error}
+        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+          <HiOutlineExclamationCircle size={20} className="shrink-0" />
+          <span>Error: {error}</span>
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 flex flex-col h-[500px]">
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      {/* Chat Container */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[550px] overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-slate-50/50">
           {messages.map((m) => (
             <div
               key={m.id}
               className={`flex ${m.isOperator ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${
+                className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-xs ${
                   m.isOperator
-                    ? "bg-blue-600 text-white rounded-br-sm"
-                    : "bg-slate-100 text-slate-800 rounded-bl-sm"
+                    ? "bg-blue-600 text-white rounded-br-xs"
+                    : "bg-white text-slate-800 rounded-bl-xs border border-slate-200"
                 }`}
               >
-                <p className="text-xs font-medium mb-1 opacity-70">
+                <p
+                  className={`text-xs font-bold mb-1 opacity-80 ${m.isOperator ? "text-blue-100" : "text-slate-500"}`}
+                >
                   {m.createdBy}
                 </p>
-                <p>{m.message}</p>
+                <p className="leading-relaxed">{m.message}</p>
                 {m.mediaUrl && (
                   <img
                     src={m.mediaUrl}
                     alt="attachment"
-                    className="mt-2 rounded-lg max-w-full"
+                    className="mt-2.5 rounded-xl max-w-full border border-black/10"
                   />
                 )}
-                <p className="text-xs opacity-60 mt-1 text-right">
+                <p
+                  className={`text-[10px] opacity-70 mt-1.5 text-right font-medium ${m.isOperator ? "text-blue-100" : "text-slate-400"}`}
+                >
                   {new Date(m.createdAt).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -139,22 +159,24 @@ export default function SupportDetailPage() {
           <div ref={bottomRef} />
         </div>
 
+        {/* Input Form */}
         <form
           onSubmit={handleSend}
-          className="border-t border-slate-100 p-3 flex gap-2"
+          className="bg-white border-t border-slate-200 p-4 flex gap-3 items-center"
         >
           <input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a reply..."
-            className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           />
           <button
             type="submit"
             disabled={sending || !newMessage.trim()}
-            className="text-sm font-medium px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition"
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-sm"
           >
-            {sending ? "..." : "Send"}
+            <span>{sending ? "Sending..." : "Send"}</span>
+            <HiOutlinePaperAirplane size={16} />
           </button>
         </form>
       </div>

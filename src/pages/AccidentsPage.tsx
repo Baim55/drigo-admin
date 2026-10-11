@@ -7,6 +7,13 @@ import {
   deleteAccident,
 } from "../api/accidents";
 import type { Accident, AccidentStatus, FaultParty } from "../types/accident";
+import {
+  HiOutlinePlus,
+  HiOutlineXMark,
+  HiOutlineExclamationCircle,
+  HiOutlineTrash,
+  HiOutlinePencilSquare,
+} from "react-icons/hi2";
 
 const STATUSES: AccidentStatus[] = [
   "Reported",
@@ -17,10 +24,10 @@ const STATUSES: AccidentStatus[] = [
 const FAULTS: FaultParty[] = ["Customer", "ThirdParty", "Unknown"];
 
 const STATUS_STYLES: Record<AccidentStatus, string> = {
-  Reported: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
-  UnderReview: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
-  Resolved: "bg-green-50 text-green-700 ring-1 ring-green-200",
-  Closed: "bg-slate-100 text-slate-500 ring-1 ring-slate-200",
+  Reported: "bg-amber-50 text-amber-700 ring-1 ring-amber-200/80",
+  UnderReview: "bg-blue-50 text-blue-700 ring-1 ring-blue-200/80",
+  Resolved: "bg-green-50 text-green-700 ring-1 ring-green-200/80",
+  Closed: "bg-slate-100 text-slate-500 ring-1 ring-slate-200/80",
 };
 
 export default function AccidentsPage() {
@@ -140,18 +147,30 @@ export default function AccidentsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Accidents</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Accidents Management
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Track, review and manage vehicle accident logs and claims.
+          </p>
+        </div>
         <button
           onClick={() => (showForm ? resetForm() : setShowForm(true))}
-          className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition"
+          className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2.5 rounded-xl shadow-sm shadow-blue-600/20 transition"
         >
-          {showForm ? "Cancel" : "+ Add accident"}
+          {showForm ? (
+            <HiOutlineXMark size={18} />
+          ) : (
+            <HiOutlinePlus size={18} />
+          )}
+          <span>{showForm ? "Cancel" : "Add Accident"}</span>
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-1 mb-4">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
         {(["", ...STATUSES] as (AccidentStatus | "")[]).map((s) => (
           <button
             key={s || "all"}
@@ -159,120 +178,153 @@ export default function AccidentsPage() {
               setStatus(s);
               setPage(1);
             }}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
               status === s
-                ? "bg-slate-800 text-white"
-                : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
             }`}
           >
-            {s || "All"}
+            {s || "All Accidents"}
           </button>
         ))}
       </div>
 
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Error: {error}
+        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+          <HiOutlineExclamationCircle size={20} className="shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {showForm && (
-        <form
-          onSubmit={handleCreate}
-          className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6 flex flex-wrap items-end gap-3"
-        >
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">
-              Rental ID
-            </label>
-            <input
-              type="number"
-              required
-              disabled={editingId !== null}
-              value={rentalId}
-              onChange={(e) => setRentalId(e.target.value)}
-              className="w-28 rounded-md border border-slate-300 px-3 py-2 text-sm disabled:bg-slate-100"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">
-              Fault party
-            </label>
-            <select
-              value={faultParty}
-              onChange={(e) => setFaultParty(e.target.value as FaultParty)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm bg-white"
-            >
-              {FAULTS.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">
-              Estimated cost (AED)
-            </label>
-            <input
-              type="number"
-              required
-              value={estimatedCost}
-              onChange={(e) => setEstimatedCost(e.target.value)}
-              className="w-32 rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">
-              Location
-            </label>
-            <input
-              required
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </div>
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs text-slate-500 mb-1">
-              Description
-            </label>
-            <input
-              required
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={saving}
-            className="text-sm font-medium text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md disabled:opacity-50 transition"
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 transition-all">
+          <h3 className="text-base font-bold text-slate-800 mb-4">
+            {editingId !== null
+              ? "Edit Accident Record"
+              : "New Accident Record"}
+          </h3>
+          <form
+            onSubmit={handleCreate}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           >
-            {saving ? "Saving..." : editingId !== null ? "Update" : "Create"}
-          </button>
-        </form>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Rental ID
+              </label>
+              <input
+                type="number"
+                required
+                disabled={editingId !== null}
+                value={rentalId}
+                onChange={(e) => setRentalId(e.target.value)}
+                placeholder="e.g. 1042"
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Fault Party
+              </label>
+              <select
+                value={faultParty}
+                onChange={(e) => setFaultParty(e.target.value as FaultParty)}
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {FAULTS.map((f) => (
+                  <option key={f} value={f}>
+                    {f}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Estimated Cost (AED)
+              </label>
+              <input
+                type="number"
+                required
+                value={estimatedCost}
+                onChange={(e) => setEstimatedCost(e.target.value)}
+                placeholder="0.00"
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Location
+              </label>
+              <input
+                type="text"
+                required
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g. Sheikh Zayed Road"
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Description
+              </label>
+              <input
+                type="text"
+                required
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief summary of the incident..."
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="sm:col-span-full flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={resetForm}
+                className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition shadow-sm"
+              >
+                {saving
+                  ? "Saving..."
+                  : editingId !== null
+                    ? "Update Record"
+                    : "Save Record"}
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      {loading && <p className="text-slate-500">Loading...</p>}
+      {loading && (
+        <div className="py-12 text-center text-slate-500 font-medium">
+          Loading records...
+        </div>
+      )}
       {!loading && !error && accidents.length === 0 && (
-        <p className="text-slate-500">No accidents found.</p>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500">
+          No accidents found.
+        </div>
       )}
 
       {!loading && accidents.length > 0 && (
         <>
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-600 text-left border-b border-slate-200">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-50/70 text-slate-500 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
                   <tr>
-                    <th className="px-4 py-3 font-medium">ID</th>
-                    <th className="px-4 py-3 font-medium">Rental</th>
-                    <th className="px-4 py-3 font-medium">Fault</th>
-                    <th className="px-4 py-3 font-medium">Cost</th>
-                    <th className="px-4 py-3 font-medium">Location</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium"></th>
+                    <th className="px-5 py-3.5 font-medium">ID</th>
+                    <th className="px-5 py-3.5 font-medium">Rental</th>
+                    <th className="px-5 py-3.5 font-medium">Fault</th>
+                    <th className="px-5 py-3.5 font-medium">Cost</th>
+                    <th className="px-5 py-3.5 font-medium">Location</th>
+                    <th className="px-5 py-3.5 font-medium">Status</th>
+                    <th className="px-5 py-3.5 font-medium"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -281,25 +333,27 @@ export default function AccidentsPage() {
                       key={a.id}
                       className="hover:bg-slate-50/70 transition-colors"
                     >
-                      <td className="px-4 py-3 text-slate-400 font-mono text-xs">
+                      <td className="px-5 py-4 text-slate-400 font-mono text-xs">
                         #{a.id}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4">
                         <Link
                           to={`/rentals/${a.rentalId}`}
-                          className="text-blue-600 hover:underline"
+                          className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1"
                         >
                           #{a.rentalId}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-5 py-4 text-slate-600 font-medium">
                         {a.faultParty}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-800">
+                      <td className="px-5 py-4 font-semibold text-slate-900">
                         {a.estimatedCost} {a.currency}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">{a.location}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4 text-slate-600 max-w-xs truncate">
+                        {a.location}
+                      </td>
+                      <td className="px-5 py-4">
                         <select
                           value={a.status}
                           disabled={busyId === a.id}
@@ -309,7 +363,7 @@ export default function AccidentsPage() {
                               e.target.value as AccidentStatus,
                             )
                           }
-                          className={`rounded-full px-2 py-1 text-xs font-medium border-0 ${STATUS_STYLES[a.status]}`}
+                          className={`rounded-full px-2.5 py-1 text-xs font-semibold border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 ${STATUS_STYLES[a.status]}`}
                         >
                           {STATUSES.map((s) => (
                             <option key={s} value={s}>
@@ -318,19 +372,21 @@ export default function AccidentsPage() {
                           ))}
                         </select>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-5 py-4 text-right space-x-2">
                         <button
                           onClick={() => startEdit(a)}
-                          className="text-xs font-medium text-blue-600 hover:underline mr-3"
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition inline-flex items-center gap-1 text-xs font-semibold"
+                          title="Edit"
                         >
-                          Edit
+                          <HiOutlinePencilSquare size={18} />
                         </button>
                         <button
                           onClick={() => handleDelete(a.id)}
                           disabled={busyId === a.id}
-                          className="text-xs font-medium text-red-600 hover:underline disabled:opacity-50"
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition inline-flex items-center gap-1 text-xs font-semibold disabled:opacity-50"
+                          title="Delete"
                         >
-                          Delete
+                          <HiOutlineTrash size={18} />
                         </button>
                       </td>
                     </tr>
@@ -340,22 +396,25 @@ export default function AccidentsPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-slate-500">
-              Total {total} accidents, page {page}/{totalPages}
+          <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-t border-slate-200 gap-3">
+            <p className="text-xs font-medium text-slate-500">
+              Showing page{" "}
+              <span className="font-bold text-slate-700">{page}</span> of{" "}
+              <span className="font-bold text-slate-700">{totalPages}</span> (
+              {total} total items)
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 hover:bg-slate-50 transition"
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 hover:bg-slate-50 transition"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 hover:bg-slate-50 transition"
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 hover:bg-slate-50 transition"
               >
                 Next
               </button>

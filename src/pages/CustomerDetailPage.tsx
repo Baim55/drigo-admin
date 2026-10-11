@@ -8,6 +8,13 @@ import {
   deleteCustomer,
 } from "../api/customers";
 import type { CustomerDetail, DocumentDetail } from "../types/customer";
+import {
+  HiOutlineArrowLongLeft,
+  HiOutlineExclamationCircle,
+  HiOutlineUser,
+  HiOutlineShare,
+  HiOutlineFaceSmile,
+} from "react-icons/hi2";
 
 export default function CustomerDetailPage() {
   const { id } = useParams();
@@ -56,65 +63,18 @@ export default function CustomerDetailPage() {
     }
   }
 
-  async function handleBlockToggle() {
-    if (!id || !customer) return;
-    const willBlock = !customer.isBlocked;
-    const confirmed = window.confirm(
-      willBlock ? "Block this customer?" : "Unblock this customer?",
+  if (loading)
+    return (
+      <p className="py-12 text-center text-slate-500 font-medium">
+        Loading customer details...
+      </p>
     );
-    if (!confirmed) return;
-
-    setWorking(true);
-    setActionError("");
-    try {
-      await blockCustomer(id, willBlock);
-      loadCustomer();
-    } catch (err) {
-      setActionError((err as Error).message);
-    } finally {
-      setWorking(false);
-    }
-  }
-
-  async function handleRestore() {
-    if (!id) return;
-    setWorking(true);
-    setActionError("");
-    try {
-      await restoreCustomer(id);
-      loadCustomer();
-    } catch (err) {
-      setActionError((err as Error).message);
-    } finally {
-      setWorking(false);
-    }
-  }
-
-  async function handleDelete() {
-    if (!id) return;
-    const confirmed = window.confirm(
-      "Delete this customer? It can be restored later.",
-    );
-    if (!confirmed) return;
-
-    setWorking(true);
-    setActionError("");
-    try {
-      await deleteCustomer(id);
-      navigate("/customers");
-    } catch (err) {
-      setActionError((err as Error).message);
-    } finally {
-      setWorking(false);
-    }
-  }
-
-  if (loading) return <p className="text-slate-500">Loading...</p>;
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-        Error: {error}
+      <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+        <HiOutlineExclamationCircle size={20} className="shrink-0" />
+        <span>Error: {error}</span>
       </div>
     );
   }
@@ -122,39 +82,42 @@ export default function CustomerDetailPage() {
   if (!customer) return null;
 
   return (
-    <div className="max-w-8xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto">
       <Link
         to="/customers"
-        className="text-sm text-blue-600 hover:underline mb-4 inline-block"
+        className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1.5"
       >
-        ← Back to customers
+        <HiOutlineArrowLongLeft size={20} />
+        <span>Back to customers</span>
       </Link>
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
-        <div className="flex items-center justify-between">
+
+      {/* Header Profile Card */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             {customer.profilePhotoUrl ? (
               <img
                 src={customer.profilePhotoUrl}
                 alt={customer.fullName}
-                className="w-16 h-16 rounded-full object-cover"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shadow-xs"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xl font-semibold">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl font-bold shadow-xs">
                 {customer.fullName.charAt(0)}
               </div>
             )}
             <div>
-              <h1 className="text-xl font-bold text-slate-900">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 {customer.fullName}
               </h1>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm font-medium text-slate-500 mt-0.5">
                 {customer.phoneNumber} · {customer.email ?? "No email"}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {customer.isBlocked && (
-              <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-red-50 text-red-600 ring-1 ring-red-200">
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-red-50 text-red-600 ring-1 ring-red-200">
                 Blocked
               </span>
             )}
@@ -164,31 +127,32 @@ export default function CustomerDetailPage() {
               </span>
             )}
             {customer.isVerified ? (
-              <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-green-50 text-green-700 ring-1 ring-green-200">
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
                 Verified
               </span>
             ) : (
-              <span className="px-3 py-1.5 rounded-full text-sm font-semibold bg-amber-50 text-amber-700 ring-1 ring-amber-200">
-                Pending
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                Pending Verification
               </span>
             )}
           </div>
         </div>
+
         {!customer.isVerified && (
-          <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+          <div className="flex gap-3 mt-6 pt-6 border-t border-slate-100">
             <button
               onClick={() => handleVerify(true)}
               disabled={verifying}
-              className="text-sm font-medium px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition"
+              className="text-sm font-semibold px-5 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-sm"
             >
-              {verifying ? "Processing..." : "Approve"}
+              {verifying ? "Processing..." : "Approve Customer"}
             </button>
             <button
               onClick={() => handleVerify(false)}
               disabled={verifying}
-              className="text-sm font-medium px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition"
+              className="text-sm font-semibold px-5 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition shadow-sm"
             >
-              Reject
+              Reject Customer
             </button>
           </div>
         )}
@@ -228,7 +192,9 @@ export default function CustomerDetailPage() {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+      {/* Documents Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <DocumentCard title="Passport" doc={customer.passportDetail} />
         <DocumentCard
           title="Driver License"
@@ -239,37 +205,49 @@ export default function CustomerDetailPage() {
           doc={customer.nationalIdentityDetail}
         />
       </div>
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6 mb-6">
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-          Face verification
-        </h2>
-        {customer.faceVerifyDetail ? (
-          <div className="flex items-center gap-4">
-            {customer.faceVerifyDetail.selfieUrl && (
-              <img
-                src={customer.faceVerifyDetail.selfieUrl}
-                alt="Selfie"
-                className="w-20 h-20 rounded-lg object-cover"
-              />
-            )}
-            <dl className="space-y-1 text-sm w-64">
-              <Row label="Status" value={customer.faceVerifyDetail.status} />
-              <Row
-                label="Match score"
-                value={`${(customer.faceVerifyDetail.matchScore * 100).toFixed(0)}%`}
-              />
-            </dl>
-          </div>
-        ) : (
-          <p className="text-sm text-slate-400">Not submitted.</p>
-        )}
-      </div>
+
+      {/* Face Verification & Info Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-            Account
+        {/* Face Verification */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <HiOutlineFaceSmile size={18} className="text-blue-600" />
+              <span>Face verification</span>
+            </h2>
+            {customer.faceVerifyDetail ? (
+              <div className="flex items-center gap-4">
+                {customer.faceVerifyDetail.selfieUrl && (
+                  <img
+                    src={customer.faceVerifyDetail.selfieUrl}
+                    alt="Selfie"
+                    className="w-20 h-20 rounded-xl object-cover border border-slate-200 shadow-xs"
+                  />
+                )}
+                <dl className="space-y-2 text-sm flex-1">
+                  <Row
+                    label="Status"
+                    value={customer.faceVerifyDetail.status}
+                  />
+                  <Row
+                    label="Match score"
+                    value={`${(customer.faceVerifyDetail.matchScore * 100).toFixed(0)}%`}
+                  />
+                </dl>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400">Not submitted.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Account Details */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <HiOutlineUser size={18} className="text-blue-600" />
+            <span>Account details</span>
           </h2>
-          <dl className="space-y-2 text-sm">
+          <dl className="space-y-2.5 text-sm">
             <Row label="Type" value={customer.userType} />
             <Row label="Platform" value={customer.platform} />
             <Row label="Gender" value={customer.gender ?? "N/A"} />
@@ -277,29 +255,49 @@ export default function CustomerDetailPage() {
             <Row label="Bonus balance" value={`${customer.bonusBalance} AED`} />
           </dl>
         </div>
-        {customer.referralDetail && (
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-6">
-            <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-              Referral
-            </h2>
-            <dl className="space-y-2 text-sm">
-              <Row label="Code" value={customer.referralDetail.code} />
-              <Row
-                label="Referred by"
-                value={customer.referralDetail.referredByCode ?? "N/A"}
-              />
-              <Row
-                label="Referred count"
-                value={customer.referralDetail.referredCount}
-              />
-              <Row
-                label="Bonus earned"
-                value={`${customer.referralDetail.bonusEarned} AED`}
-              />
-            </dl>
-          </div>
-        )}
       </div>
+
+      {/* Referral Details if available */}
+      {customer.referralDetail && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <HiOutlineShare size={18} className="text-blue-600" />
+            <span>Referral program</span>
+          </h2>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <span className="text-xs text-slate-400 block mb-1">Code</span>
+              <span className="font-bold text-slate-800 font-mono">
+                {customer.referralDetail.code}
+              </span>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <span className="text-xs text-slate-400 block mb-1">
+                Referred by
+              </span>
+              <span className="font-bold text-slate-800">
+                {customer.referralDetail.referredByCode ?? "N/A"}
+              </span>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <span className="text-xs text-slate-400 block mb-1">
+                Referred count
+              </span>
+              <span className="font-bold text-slate-800">
+                {customer.referralDetail.referredCount}
+              </span>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <span className="text-xs text-slate-400 block mb-1">
+                Bonus earned
+              </span>
+              <span className="font-bold text-emerald-600">
+                {customer.referralDetail.bonusEarned} AED
+              </span>
+            </div>
+          </dl>
+        </div>
+      )}
     </div>
   );
 }
@@ -313,45 +311,51 @@ function DocumentCard({
 }) {
   if (!doc) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4">
-        <h3 className="text-sm font-semibold text-slate-700 mb-2">{title}</h3>
-        <p className="text-sm text-slate-400">Not uploaded.</p>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          {title}
+        </h3>
+        <p className="text-sm text-slate-400 font-medium">Not uploaded.</p>
       </div>
     );
   }
 
   const statusStyle =
     doc.status === "Verified"
-      ? "bg-green-50 text-green-700 ring-1 ring-green-200"
+      ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
       : doc.status === "Rejected"
         ? "bg-red-50 text-red-700 ring-1 ring-red-200"
         : "bg-amber-50 text-amber-700 ring-1 ring-amber-200";
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+          {title}
+        </h3>
         <span
-          className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle}`}
+          className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${statusStyle}`}
         >
           {doc.status}
         </span>
       </div>
       {doc.frontUrl && (
-        <img
-          src={doc.frontUrl}
-          alt={title}
-          className="w-full h-24 object-cover rounded-md mb-2"
-        />
+        <div className="h-32 w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+          <img
+            src={doc.frontUrl}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        </div>
       )}
       {doc.ocr && (
-        <p className="text-xs text-slate-500">
-          {doc.ocr.number} · exp.{" "}
+        <p className="text-xs font-medium text-slate-600">
+          <span className="font-mono">{doc.ocr.number}</span> · exp.{" "}
           {new Date(doc.ocr.expiryDate).toLocaleDateString()}
         </p>
       )}
       {doc.rejectionReason && (
-        <p className="text-xs text-red-600 mt-1">
+        <p className="text-xs font-medium text-red-600 bg-red-50 p-2 rounded-lg">
           Reason: {doc.rejectionReason}
         </p>
       )}
@@ -361,9 +365,9 @@ function DocumentCard({
 
 function Row({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex justify-between py-1 border-b border-slate-50 last:border-0">
-      <dt className="text-slate-500">{label}</dt>
-      <dd className="font-medium text-slate-800">{value}</dd>
+    <div className="flex justify-between py-1.5 border-b border-slate-100 last:border-0">
+      <dt className="text-slate-500 font-medium">{label}</dt>
+      <dd className="font-semibold text-slate-800">{value}</dd>
     </div>
   );
 }

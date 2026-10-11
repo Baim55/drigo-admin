@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCustomers } from "../api/customers";
 import type { Customer } from "../types/customer";
+import {
+  HiOutlineUsers,
+  HiOutlineMagnifyingGlass,
+  HiOutlineExclamationCircle,
+  HiOutlineChevronLeft,
+  HiOutlineChevronRight,
+} from "react-icons/hi2";
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -29,9 +36,25 @@ export default function CustomersPage() {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Customers</h1>
-      <div className="mb-4">
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <HiOutlineUsers className="text-blue-600" size={28} />
+          <span>Customers Management</span>
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          View registered users, track verification status, and inspect account
+          states.
+        </p>
+      </div>
+
+      {/* Search Input */}
+      <div className="relative w-full max-w-sm">
+        <HiOutlineMagnifyingGlass
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+          size={18}
+        />
         <input
           placeholder="Search by name, phone, email..."
           value={search}
@@ -39,40 +62,51 @@ export default function CustomersPage() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="w-full max-w-sm rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         />
       </div>
-      {loading && <p className="text-slate-500">Loading...</p>}
-      {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Error: {error}
+
+      {loading && (
+        <div className="py-12 text-center text-slate-500 font-medium">
+          Loading customers...
         </div>
       )}
-      {!loading && !error && customers.length === 0 && (
-        <p className="text-slate-500">No customers found.</p>
+
+      {error && (
+        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+          <HiOutlineExclamationCircle size={20} className="shrink-0" />
+          <span>Error: {error}</span>
+        </div>
       )}
+
+      {!loading && !error && customers.length === 0 && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 font-medium">
+          No customers found.
+        </div>
+      )}
+
       {!loading && !error && customers.length > 0 && (
-        <>
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-600 text-left border-b border-slate-200">
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full text-sm text-left min-w-[700px]">
+                <thead className="bg-slate-50/70 text-slate-500 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Name</th>
-                    <th className="px-4 py-3 font-medium">Phone</th>
-                    <th className="px-4 py-3 font-medium">Email</th>
-                    <th className="px-4 py-3 font-medium">Type</th>
-                    <th className="px-4 py-3 font-medium">Verification</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-5 py-3.5">Name</th>
+                    <th className="px-5 py-3.5">Phone</th>
+                    <th className="px-5 py-3.5">Email</th>
+                    <th className="px-5 py-3.5">Type</th>
+                    <th className="px-5 py-3.5">Verification</th>
+                    <th className="px-5 py-3.5">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {customers.map((c) => (
                     <tr
                       key={c.id}
-                      className="hover:bg-slate-50/70 transition-colors"
+                      className="hover:bg-slate-50/60 transition-colors"
                     >
-                      <td className="px-5 py-4 font-semibold text-slate-800">
+                      <td className="px-5 py-4 font-bold text-slate-900">
                         <Link
                           to={`/customers/${c.id}`}
                           className="hover:text-blue-600 hover:underline"
@@ -80,30 +114,36 @@ export default function CustomersPage() {
                           {c.fullName}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-5 py-4 text-slate-600 font-mono text-xs">
                         {c.phoneNumber}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-5 py-4 text-slate-600">
                         {c.email ?? "-"}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">{c.userType}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4 text-slate-600 font-medium">
+                        {c.userType}
+                      </td>
+                      <td className="px-5 py-4">
                         {c.isBlocked ? (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600 ring-1 ring-red-200">
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600 ring-1 ring-red-200">
                             Blocked
                           </span>
                         ) : c.isVerified ? (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 ring-1 ring-green-200">
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
                             Verified
                           </span>
                         ) : (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 ring-1 ring-amber-200">
                             Pending
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {c.isApproved ? "Approved" : "Not approved"}
+                      <td className="px-5 py-4 text-slate-600 font-medium">
+                        {c.isApproved ? (
+                          <span className="text-emerald-600">Approved</span>
+                        ) : (
+                          <span className="text-slate-400">Not approved</span>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -111,28 +151,35 @@ export default function CustomersPage() {
               </table>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-slate-500">
-              Total {total} customers, page {page}/{totalPages}
+
+          {/* Pagination */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-1">
+            <p className="text-xs font-medium text-slate-500">
+              Total <span className="font-bold text-slate-700">{total}</span>{" "}
+              customers, page{" "}
+              <span className="font-bold text-slate-700">{page}</span>/
+              <span className="font-bold text-slate-700">{totalPages}</span>
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition bg-white"
               >
-                Previous
+                <HiOutlineChevronLeft size={16} />
+                <span>Previous</span>
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 text-sm rounded-md border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition bg-white"
               >
-                Next
+                <span>Next</span>
+                <HiOutlineChevronRight size={16} />
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

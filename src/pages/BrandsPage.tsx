@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { getBrands, createBrand, deleteBrand } from "../api/brands";
 import type { Brand } from "../api/brands";
+import {
+  HiOutlinePlus,
+  HiOutlineBuildingStorefront,
+  HiOutlineTrash,
+  HiOutlineExclamationCircle,
+} from "react-icons/hi2";
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -53,80 +59,116 @@ export default function BrandsPage() {
   }
 
   return (
-    <div className="max-w-8xl">
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Brands</h1>
+    <div className="space-y-6 max-w-5xl">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          Brands Management
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Manage vehicle manufacturers and brands available in the fleet.
+        </p>
+      </div>
 
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
-          Error: {error}
+        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600 flex items-center gap-3">
+          <HiOutlineExclamationCircle size={20} className="shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
-      <form onSubmit={handleCreate} className="flex gap-2 mb-6">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="New brand name (e.g. Tesla)"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          disabled={saving || !name.trim()}
-          className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md disabled:opacity-50 transition"
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <form
+          onSubmit={handleCreate}
+          className="flex flex-col sm:flex-row gap-3"
         >
-          {saving ? "Adding..." : "+ Add brand"}
-        </button>
-      </form>
+          <div className="relative flex-1">
+            <HiOutlineBuildingStorefront
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              size={20}
+            />
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="New brand name (e.g. Tesla, Porsche)"
+              className="w-full rounded-xl border border-slate-300 pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={saving || !name.trim()}
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl disabled:opacity-50 transition shadow-sm shadow-blue-600/20"
+          >
+            <HiOutlinePlus size={18} />
+            <span>{saving ? "Adding..." : "Add Brand"}</span>
+          </button>
+        </form>
+      </div>
 
       {loading ? (
-        <p className="text-slate-500">Loading...</p>
+        <div className="py-12 text-center text-slate-500 font-medium">
+          Loading brands...
+        </div>
       ) : brands.length === 0 ? (
-        <p className="text-slate-500">No brands found.</p>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500">
+          No brands found.
+        </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-slate-600 text-left border-b border-slate-200">
-              <tr>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Cars</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {brands.map((b) => (
-                <tr
-                  key={b.id}
-                  className="hover:bg-slate-50/70 transition-colors"
-                >
-                  <td className="px-4 py-3 font-semibold text-slate-800">
-                    {b.name}
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{b.carCount}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        b.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-slate-100 text-slate-600"
-                      }`}
-                    >
-                      {b.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => handleDelete(b.id)}
-                      disabled={deletingId === b.id}
-                      className="text-xs font-medium text-red-600 hover:underline disabled:opacity-50"
-                    >
-                      {deletingId === b.id ? "Deleting..." : "Delete"}
-                    </button>
-                  </td>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          {/* overflow-x-auto və custom-scrollbar əlavə edildi */}
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-sm text-left min-w-[500px]">
+              <thead className="bg-slate-50/70 text-slate-500 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
+                <tr>
+                  <th className="px-6 py-3.5">Brand Name</th>
+                  <th className="px-6 py-3.5">Associated Cars</th>
+                  <th className="px-6 py-3.5">Status</th>
+                  <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {brands.map((b) => (
+                  <tr
+                    key={b.id}
+                    className="hover:bg-slate-50/60 transition-colors"
+                  >
+                    <td className="px-6 py-4 font-bold text-slate-900 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs">
+                        {b.name.charAt(0)}
+                      </div>
+                      {b.name}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600 font-medium">
+                      {b.carCount} cars
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          b.isActive
+                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                            : "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
+                        }`}
+                      >
+                        {b.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => handleDelete(b.id)}
+                        disabled={deletingId === b.id}
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition inline-flex items-center gap-1 text-xs font-semibold disabled:opacity-50"
+                        title="Delete"
+                      >
+                        <HiOutlineTrash size={18} />
+                        <span>
+                          {deletingId === b.id ? "Deleting..." : "Delete"}
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
