@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import RequirePermission from "../components/RequirePermission";
 import LoginPage from "../pages/LoginPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import AdminLayout from "../components/AdminLayout";
@@ -41,94 +42,203 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard",
-            element: <DashboardPage />,
+            element: (
+              <RequirePermission code="dashboard.view">
+                <DashboardPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/cars",
-            element: <CarsPage />,
+            element: (
+              <RequirePermission code="cars.view">
+                <CarsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/cars/tracking",
-            element: <CarsTrackingPage />,
+            element: (
+              <RequirePermission code="cars.view">
+                <CarsTrackingPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/cars/problematic",
-            element: <ProblematicCarsPage />,
+            element: (
+              <RequirePermission code="cars.view">
+                <ProblematicCarsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/rentals",
-            element: <RentalsPage />,
+            element: (
+              <RequirePermission code="rentals.view">
+                <RentalsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/customers",
-            element: <CustomersPage />,
+            element: (
+              <RequirePermission code="customers.view">
+                <CustomersPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/debts",
-            element: <DebtorsPage />,
+            element: (
+              <RequirePermission code="debts.view">
+                <DebtorsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/fines",
-            element: <FinesPage />,
+            element: (
+              <RequirePermission code="fines.view">
+                <FinesPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/reservations",
-            element: <ReservationsPage />,
+            element: (
+              <RequirePermission code="reservations.view">
+                <ReservationsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/support",
-            element: <SupportPage />,
+            element: (
+              <RequirePermission code="support.view">
+                <SupportPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/analytics",
-            element: <AnalyticsPage />,
+            element: (
+              <RequirePermission code="analytics.view">
+                <AnalyticsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/tariffs",
-            element: <TariffsPage />,
+            element: (
+              <RequirePermission code="tariffs.view">
+                <TariffsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/discounts",
-            element: <DiscountsPage />,
+            element: (
+              <RequirePermission code="promotions.view">
+                <DiscountsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/settings",
-            element: <SettingsPage />,
+            element: (
+              <RequirePermission code="settings.view">
+                <SettingsPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/geozones",
-            element: <GeoZonesPage />,
+            element: (
+              <RequirePermission code="fleet.view">
+                <GeoZonesPage />
+              </RequirePermission>
+            ),
           },
-          { path: "/brands", element: <BrandsPage /> },
-          { path: "/brands/:id", element: <BrandDetailPage /> },
-          { path: "/accidents", element: <AccidentsPage /> },
+          {
+            path: "/brands",
+            element: (
+              <RequirePermission code="cars.view">
+                <BrandsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/brands/:id",
+            element: (
+              <RequirePermission code="cars.view">
+                <BrandDetailPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/accidents",
+            element: (
+              <RequirePermission code="fines.view">
+                <AccidentsPage />
+              </RequirePermission>
+            ),
+          },
           {
             path: "/cars/:id",
-            element: <CarDetailPage />,
+            element: (
+              <RequirePermission code="cars.view">
+                <CarDetailPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/rentals/:id",
-            element: <RentalDetailPage />,
+            element: (
+              <RequirePermission code="rentals.view">
+                <RentalDetailPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/customers/:id",
-            element: <CustomerDetailPage />,
+            element: (
+              <RequirePermission code="customers.view">
+                <CustomerDetailPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/debts/:id",
-            element: <DebtorDetailPage />,
+            element: (
+              <RequirePermission code="debts.view">
+                <DebtorDetailPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/fines/:id",
-            element: <FineDetailPage />,
+            element: (
+              <RequirePermission code="fines.view">
+                <FineDetailPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/reservations/:id",
-            element: <ReservationDetailPage />,
+            element: (
+              <RequirePermission code="reservations.view">
+                <ReservationDetailPage />
+              </RequirePermission>
+            ),
           },
           {
             path: "/support/:id",
-            element: <SupportDetailPage />,
+            element: (
+              <RequirePermission code="support.view">
+                <SupportDetailPage />
+              </RequirePermission>
+            ),
           },
         ],
       },

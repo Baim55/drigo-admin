@@ -11,5 +11,14 @@ export interface VerifyRequest {
 export interface AdminUser {
   id: string;
   username: string;
-  role: string;
+  fullName?: string;
+  email?: string;
+  isSuperAdmin?: boolean;
+  role?: string;
+}
+
+export interface MyPermissions {
+  adminId: string;
+  isSuperAdmin: boolean;
+  permissionCodes: string[];
 }
