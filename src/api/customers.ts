@@ -38,3 +38,22 @@ export function verifyCustomer(id: string, payload: VerifyPayload) {
     body: JSON.stringify(payload),
   });
 }
+
+export function blockCustomer(id: string, isBlocked: boolean) {
+  return apiClient<unknown>(`/api/admin/users/${id}/block`, {
+    method: "PATCH",
+    body: JSON.stringify({ isBlocked }),
+  });
+}
+
+export function restoreCustomer(id: string) {
+  return apiClient<unknown>(`/api/admin/users/${id}/restore`, {
+    method: "POST",
+  });
+}
+
+export function deleteCustomer(id: string) {
+  return apiClient<unknown>(`/api/admin/users/${id}`, {
+    method: "DELETE",
+  });
+}
