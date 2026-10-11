@@ -20,6 +20,8 @@ import {
   HiOutlineArrowRightOnRectangle,
   HiOutlineBars3,
   HiOutlineXMark,
+  HiOutlineMegaphone,
+  HiOutlinePhoto,
 } from "react-icons/hi2";
 import type { AdminUser } from "../types/auth";
 
@@ -124,6 +126,18 @@ const NAV_LINKS = [
     to: "/promo-codes",
     label: "Promo codes",
     icon: HiOutlineTag,
+    permission: "promotions.view",
+  },
+  {
+    to: "/promotions",
+    label: "Promotions",
+    icon: HiOutlineMegaphone,
+    permission: "promotions.view",
+  },
+  {
+    to: "/stories",
+    label: "Stories",
+    icon: HiOutlinePhoto,
     permission: "promotions.view",
   },
 ];

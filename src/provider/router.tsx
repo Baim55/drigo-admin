@@ -30,6 +30,8 @@ import AccidentsPage from "../pages/AccidentsPage";
 import BrandDetailPage from "../pages/BrandDetailPage";
 import DeliveriesPage from "../pages/DeliveriesPage";
 import PromoCodesPage from "../pages/PromoCodesPage";
+import PromotionsPage from "../pages/PromotionsPage";
+import StoriesPage from "../pages/StoriesPage";
 
 export const router = createBrowserRouter([
   {
@@ -199,6 +201,22 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code="promotions.view">
                 <PromoCodesPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/promotions",
+            element: (
+              <RequirePermission code="promotions.view">
+                <PromotionsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/stories",
+            element: (
+              <RequirePermission code="promotions.view">
+                <StoriesPage />
               </RequirePermission>
             ),
           },
