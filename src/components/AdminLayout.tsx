@@ -85,6 +85,7 @@ const NAV_LINKS = [
     label: "Analytics",
     icon: HiOutlineChartBarSquare,
     permission: "analytics.view",
+    end: true,
   },
   {
     to: "/tariffs",
@@ -139,6 +140,12 @@ const NAV_LINKS = [
     label: "Stories",
     icon: HiOutlinePhoto,
     permission: "promotions.view",
+  },
+  {
+    to: "/analytics/insights",
+    label: "Insights",
+    icon: HiOutlineChartBarSquare,
+    permission: "analytics.view",
   },
 ];
 
@@ -218,6 +225,7 @@ export default function AdminLayout() {
               <NavLink
                 key={link.to}
                 to={link.to}
+                end={link.end}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
