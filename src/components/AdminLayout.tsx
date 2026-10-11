@@ -22,10 +22,17 @@ import {
   HiOutlineXMark,
   HiOutlineMegaphone,
   HiOutlinePhoto,
+  HiOutlineShieldCheck,
 } from "react-icons/hi2";
 import type { AdminUser } from "../types/auth";
 
 const NAV_LINKS = [
+  {
+    to: "/admins",
+    label: "Admins",
+    icon: HiOutlineShieldCheck,
+    permission: "admins.view",
+  },
   {
     to: "/dashboard",
     label: "Dashboard",

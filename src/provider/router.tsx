@@ -33,6 +33,7 @@ import PromoCodesPage from "../pages/PromoCodesPage";
 import PromotionsPage from "../pages/PromotionsPage";
 import StoriesPage from "../pages/StoriesPage";
 import AnalyticsInsightsPage from "../pages/AnalyticsInsightsPage";
+import AdminsPage from "../pages/AdminsPage";
 
 export const router = createBrowserRouter([
   {
@@ -226,6 +227,14 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code="promotions.view">
                 <StoriesPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/admins",
+            element: (
+              <RequirePermission code="admins.view">
+                <AdminsPage />
               </RequirePermission>
             ),
           },
