@@ -203,7 +203,7 @@ export default function ReservationDetailPage() {
                 <option value="">Select a driver</option>
                 {availableDrivers.map((d) => (
                   <option key={d.id} value={d.id}>
-                    {d.name} ({d.status})
+                    {d.fullName} ({d.status})
                   </option>
                 ))}
               </select>

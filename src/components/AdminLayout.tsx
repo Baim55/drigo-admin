@@ -100,7 +100,7 @@ const NAV_LINKS = [
     to: "/brands",
     label: "Brands",
     icon: HiOutlineBuildingStorefront,
-    permission: "cars.view", 
+    permission: "cars.view",
   },
   {
     to: "/settings",
@@ -112,7 +112,13 @@ const NAV_LINKS = [
     to: "/geozones",
     label: "Geo Zones",
     icon: HiOutlineMap,
-    permission: "fleet.view", 
+    permission: "fleet.view",
+  },
+  {
+    to: "/deliveries",
+    label: "Deliveries",
+    icon: HiOutlineTruck,
+    permission: "delivery.view",
   },
 ];
 
@@ -261,7 +267,7 @@ export default function AdminLayout() {
         </header>
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 bg-slate-50/50">
           <div className="max-w-7xl mx-auto">
-            <Outlet context={{ permissions, isSuper }}/>
+            <Outlet context={{ permissions, isSuper }} />
           </div>
         </main>
       </div>

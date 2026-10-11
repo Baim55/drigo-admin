@@ -28,6 +28,7 @@ import GeoZonesPage from "../pages/GeoZonesPage";
 import BrandsPage from "../pages/BrandsPage";
 import AccidentsPage from "../pages/AccidentsPage";
 import BrandDetailPage from "../pages/BrandDetailPage";
+import DeliveriesPage from "../pages/DeliveriesPage";
 
 export const router = createBrowserRouter([
   {
@@ -181,6 +182,14 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code="fines.view">
                 <AccidentsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/deliveries",
+            element: (
+              <RequirePermission code="delivery.view">
+                <DeliveriesPage />
               </RequirePermission>
             ),
           },
