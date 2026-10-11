@@ -29,3 +29,20 @@ export function payAllDebts(userId: string) {
     { method: "POST" },
   );
 }
+
+export function payDebt(userId: string, debtId: number) {
+  return apiClient<unknown>(
+    `/api/admin/users/${userId}/debt/${debtId}/pay`,
+    { method: "POST" },
+  );
+}
+
+export function splitDebt(userId: string, debtId: number, installments: number) {
+  return apiClient<unknown>(
+    `/api/admin/users/${userId}/debt/${debtId}/split`,
+    {
+      method: "POST",
+      body: JSON.stringify({ installments }),
+    },
+  );
+}
