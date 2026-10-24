@@ -154,6 +154,12 @@ const NAV_LINKS = [
     icon: HiOutlineChartBarSquare,
     permission: "analytics.view",
   },
+  {
+    to: "/reports",
+    label: "Reports",
+    icon: HiOutlineChartBarSquare,
+    permission: "analytics.view",
+  },
 ];
 
 export default function AdminLayout() {
