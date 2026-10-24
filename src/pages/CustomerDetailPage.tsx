@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   getCustomerById,
   verifyCustomer,
@@ -22,8 +22,6 @@ export default function CustomerDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [verifying, setVerifying] = useState(false);
-
-  const navigate = useNavigate();
   const [actionError, setActionError] = useState("");
   const [working, setWorking] = useState(false);
 
@@ -63,6 +61,57 @@ export default function CustomerDetailPage() {
     }
   }
 
+  async function handleBlockToggle() {
+    if (!id || !customer) return;
+    setWorking(true);
+    setActionError("");
+    try {
+      if (customer.isBlocked) {
+        await restoreCustomer(id); // Əgər unblock üçün ayrıca funksiyanız yoxdursa restore/unblock endpoint-i
+      } else {
+        await blockCustomer(id);
+      }
+      loadCustomer();
+    } catch (err) {
+      setActionError((err as Error).message);
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function handleRestore() {
+    if (!id) return;
+    setWorking(true);
+    setActionError("");
+    try {
+      await restoreCustomer(id);
+      loadCustomer();
+    } catch (err) {
+      setActionError((err as Error).message);
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!id) return;
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this customer?",
+    );
+    if (!confirmed) return;
+
+    setWorking(true);
+    setActionError("");
+    try {
+      await deleteCustomer(id);
+      loadCustomer();
+    } catch (err) {
+      setActionError((err as Error).message);
+    } finally {
+      setWorking(false);
+    }
+  }
+
   if (loading)
     return (
       <p className="py-12 text-center text-slate-500 font-medium">
@@ -82,7 +131,7 @@ export default function CustomerDetailPage() {
   if (!customer) return null;
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto pb-12">
       <Link
         to="/customers"
         className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1.5"
@@ -158,7 +207,7 @@ export default function CustomerDetailPage() {
         )}
 
         {actionError && (
-          <div className="mt-4 rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">
+          <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
             Error: {actionError}
           </div>
         )}
@@ -168,7 +217,7 @@ export default function CustomerDetailPage() {
             <button
               onClick={handleRestore}
               disabled={working}
-              className="text-sm font-medium px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition"
+              className="text-sm font-semibold px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition shadow-sm"
             >
               Restore customer
             </button>
@@ -177,14 +226,14 @@ export default function CustomerDetailPage() {
               <button
                 onClick={handleBlockToggle}
                 disabled={working}
-                className="text-sm font-medium px-4 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition"
+                className="text-sm font-semibold px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition"
               >
                 {customer.isBlocked ? "Unblock" : "Block"}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={working}
-                className="text-sm font-medium px-4 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
+                className="text-sm font-semibold px-4 py-2 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
               >
                 Delete
               </button>
@@ -231,12 +280,14 @@ export default function CustomerDetailPage() {
                   />
                   <Row
                     label="Match score"
-                    value={`${(customer.faceVerifyDetail.matchScore * 100).toFixed(0)}%`}
+                    value={`${customer.faceVerifyDetail.matchScore.toFixed(0)}%`}
                   />
                 </dl>
               </div>
             ) : (
-              <p className="text-sm text-slate-400">Not submitted.</p>
+              <p className="text-sm text-slate-400 font-medium">
+                Not submitted.
+              </p>
             )}
           </div>
         </div>
