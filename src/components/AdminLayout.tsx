@@ -160,6 +160,12 @@ const NAV_LINKS = [
     icon: HiOutlineChartBarSquare,
     permission: "analytics.view",
   },
+  {
+    to: "/subscriptions",
+    label: "Subscriptions",
+    icon: HiOutlineDocumentDuplicate,
+    permission: "tariffs.view",
+  },
 ];
 
 export default function AdminLayout() {
