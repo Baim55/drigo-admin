@@ -166,6 +166,12 @@ const NAV_LINKS = [
     icon: HiOutlineDocumentDuplicate,
     permission: "tariffs.view",
   },
+  {
+    to: "/security",
+    label: "Security",
+    icon: HiOutlineShieldExclamation,
+    permission: "settings.view",
+  },
 ];
 
 export default function AdminLayout() {
