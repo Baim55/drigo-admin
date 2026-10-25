@@ -178,6 +178,12 @@ const NAV_LINKS = [
     icon: HiOutlineMegaphone,
     permission: "promotions.view",
   },
+  {
+    to: "/operations",
+    label: "Operations",
+    icon: HiOutlineCog6Tooth,
+    permission: "fleet.view",
+  },
 ];
 
 export default function AdminLayout() {
