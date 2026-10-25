@@ -172,6 +172,12 @@ const NAV_LINKS = [
     icon: HiOutlineShieldExclamation,
     permission: "settings.view",
   },
+  {
+    to: "/notifications",
+    label: "Notifications",
+    icon: HiOutlineMegaphone,
+    permission: "promotions.view",
+  },
 ];
 
 export default function AdminLayout() {
