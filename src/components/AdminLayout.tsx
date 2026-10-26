@@ -184,6 +184,12 @@ const NAV_LINKS = [
     icon: HiOutlineCog6Tooth,
     permission: "fleet.view",
   },
+  {
+    to: "/fleet",
+    label: "Fleet",
+    icon: HiOutlineMap,
+    permission: "fleet.view",
+  },
 ];
 
 export default function AdminLayout() {

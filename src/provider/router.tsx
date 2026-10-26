@@ -39,6 +39,7 @@ import SubscriptionsPage from "../pages/SubscriptionsPage";
 import SecurityPage from "../pages/SecurityPage";
 import NotificationsPage from "../pages/NotificationsPage";
 import OperationsPage from "../pages/OperationsPage";
+import FleetPage from "../pages/FleetPage";
 
 export const router = createBrowserRouter([
   {
@@ -280,6 +281,14 @@ export const router = createBrowserRouter([
             element: (
               <RequirePermission code="fleet.view">
                 <OperationsPage />
+              </RequirePermission>
+            ),
+          },
+          {
+            path: "/fleet",
+            element: (
+              <RequirePermission code="fleet.view">
+                <FleetPage />
               </RequirePermission>
             ),
           },
